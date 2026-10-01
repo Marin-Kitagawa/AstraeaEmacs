@@ -25,7 +25,7 @@ those; nil disables auto-enable."
 (defconst astraea-lang-registry
   '(
     ;; ── with treesit grammar + LSP ────────────────────────────────────
-    (python     :grammar python      :pkgs (pyvenv jupyter)                 :lsp ("pyright-langserver" "--stdio")     :fmtr black)
+    (python     :grammar python      :pkgs (pyvenv)                         :lsp ("pyright-langserver" "--stdio")     :fmtr black)
     (rust       :grammar rust        :pkgs ()                               :lsp ("rust-analyzer")                    :fmtr rustfmt)
     (go         :grammar go          :pkgs (go-mode)                        :lsp ("gopls")                            :fmtr gofmt)
     (javascript :grammar javascript  :pkgs ()                               :lsp ("typescript-language-server" "--stdio") :fmtr prettier-javascript)
@@ -125,8 +125,10 @@ Interactive with completion over `astraea-lang-registry'."
          (lsp (plist-get spec :lsp)))
     (unless spec (user-error "Unknown language: %s" id))
     (dolist (pkg pkgs)
-      ;; runtime queuing: the `elpaca' macro must be expanded via eval
-      (eval `(elpaca ,pkg) t))
+      ;; runtime queuing: the `elpaca' macro must be expanded via eval;
+      ;; skip if the order is already registered (prevents duplicates)
+      (unless (elpaca-get pkg)
+        (eval `(elpaca ,pkg) t)))
     (when grammar
       (with-eval-after-load 'treesit
         (add-to-list 'treesit-language-source-alist

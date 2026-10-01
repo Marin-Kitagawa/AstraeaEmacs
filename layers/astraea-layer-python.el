@@ -4,7 +4,7 @@
 ;; scimax / data-science workflow.
 
 (astraea-layer! +lang/python
-  :packages (pyvenv jupyter)
+  :packages (pyvenv)  ; jupyter is queued by the scimax org stack (core)
   :init
   (progn
     (elpaca pyvenv)
