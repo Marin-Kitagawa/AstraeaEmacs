@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;;; test-cl2.el --- test cl-loaddefs under load-prefer-newer
 (setq load-prefer-newer t)
 (condition-case e

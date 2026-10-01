@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;;; check-read.el --- batch syntax check for Astraea files
 (let ((files (directory-files-recursively
               "C:/Users/Ahri/projects/astraea-emacs" "\\.el\\'"

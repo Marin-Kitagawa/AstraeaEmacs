@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;;; fix-encoding.el --- recover original UTF-8 from double-encoded README.adoc
 (let* ((f "C:/Users/Ahri/projects/astraea-emacs/README.adoc")
        (text (with-temp-buffer

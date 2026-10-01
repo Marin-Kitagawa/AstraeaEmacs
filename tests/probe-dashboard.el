@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;;; probe-dashboard.el --- inspect live GUI state, write result to file
 (condition-case err
     (let ((failed nil)

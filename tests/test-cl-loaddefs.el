@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;;; test-cl-loaddefs.el --- isolate the cl-loaddefs load failure
 (message "load-path head: %s" (mapconcat #'identity (seq-take load-path 5) " | "))
 (condition-case e

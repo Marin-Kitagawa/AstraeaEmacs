@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;;; test-read.el --- empirical read/EOF behavior + melpa.eld check
 ;; 1) clean EOF on a complete file
 (condition-case err

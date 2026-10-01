@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;;; test-elpaca-load.el --- minimal elpaca.el load test
 (add-to-list 'load-path "C:/Users/Ahri/projects/astraea-emacs/elpaca/repos/elpaca")
 (message "lexical-binding of elpaca.el buffer-local test...")

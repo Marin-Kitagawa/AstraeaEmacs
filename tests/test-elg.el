@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;;; test-elg.el --- standalone elpaca-git/elpaca-log require test
 (setq load-prefer-newer t)
 (add-to-list 'load-path "C:/Users/Ahri/projects/astraea-emacs/elpaca/repos/elpaca")

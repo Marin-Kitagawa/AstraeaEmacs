@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;;; ci-driver.el --- CI smoke test: load framework without package processing
 (setq user-emacs-directory "C:/Users/Ahri/projects/astraea-emacs/")
 (setq astraea--ci t)
