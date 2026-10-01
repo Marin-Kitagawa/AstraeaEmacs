@@ -40,7 +40,9 @@
   (message "Astraea startup: %.3fs (emacs init %.3fs)"
            (float-time (time-subtract (current-time) before-init-time))
            (or (get 'after-init-time 'astraea-elapsed) 0))
-  (when (fboundp 'use-package-report)
+  (when (and (fboundp 'use-package-report)
+             (boundp 'use-package-compute-statistics)
+             use-package-compute-statistics)
     (use-package-report)))
 
 (defun astraea/profile-startup ()

@@ -63,7 +63,7 @@
 (unless noninteractive
   (ignore-errors
     ;; clear stale auth/socket left by killed sessions, then start fresh
-    (unless (and (server-running-p) (server-process))
+    (unless (and (server-running-p) (bound-and-true-p server-process))
       (server-force-delete)
       (server-start))))
 

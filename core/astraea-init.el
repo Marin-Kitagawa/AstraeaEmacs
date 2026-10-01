@@ -103,6 +103,17 @@
     (load user-file nil 'nomessage)))
 
 ;; ── Finish bootstrap ──────────────────────────────────────────────────────
+(defvar astraea--init-finished nil
+  "Non-nil once `astraea//finish-init' has run (it runs exactly once).")
+
+(defun astraea//all-orders-terminal-p ()
+  "Return non-nil if every elpaca order is finished or failed."
+  (and (boundp 'elpaca--queues)
+       (cl-loop for q in (reverse elpaca--queues)
+                always (cl-loop for (_ . e) in (elpaca-q<-elpacas q)
+                                always (memq (elpaca<-status e)
+                                             '(finished failed))))))
+
 (defun astraea/init ()
   "Complete Astraea bootstrap. Call this at the END of your user init file."
   (interactive)
@@ -110,20 +121,29 @@
   (astraea//install-leader)
   (run-hooks 'astraea-pre-init-hook)
   (elpaca-process-queues)
-  (add-hook 'elpaca-after-init-hook #'astraea//finish-init))
+  ;; Finish when elpaca's post-init hook fires (async first install)…
+  (add-hook 'elpaca-after-init-hook #'astraea//finish-init)
+  (add-hook 'elpaca--post-queues-hook #'astraea//finish-init)
+  ;; …or immediately when every order was already built (warm start).
+  (if (astraea//all-orders-terminal-p)
+      (astraea//finish-init)
+    ;; Fallback: idle timer in case elpaca's hook conditions never align.
+    (run-with-idle-timer 30 nil #'astraea//finish-init)))
 
 (defun astraea//finish-init ()
-  "Post-package-load finalization."
-  (astraea/modal--activate astraea-modal-style)
-  (astraea/ui//finish)
-  (run-hooks 'astraea-after-init-hook)
-  (when astraea-startup-benchmark
-    (astraea/report-startup-time))
-  (message "Astraea %s ready in %.2fs with %d layers (%s modal)"
-           astraea-version
-           (float-time (time-subtract (current-time) before-init-time))
-           (length astraea--enabled-layers)
-           astraea-modal-style))
+  "Finalize Astraea: theme, leader keys, layer configs.  Runs once."
+  (unless astraea--init-finished
+    (setq astraea--init-finished t)
+    (astraea/modal--activate astraea-modal-style)
+    (astraea/ui//finish)
+    (run-hooks 'astraea-after-init-hook)
+    (when astraea-startup-benchmark
+      (astraea/report-startup-time))
+    (message "Astraea %s ready in %.2fs with %d layers (%s modal)"
+             astraea-version
+             (float-time (time-subtract (current-time) before-init-time))
+             (length astraea--enabled-layers)
+             astraea-modal-style)))
 
 (provide 'astraea-init)
 ;;; astraea-init.el ends here
