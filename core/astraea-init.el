@@ -134,6 +134,11 @@
   "Finalize Astraea: theme, leader keys, layer configs.  Runs once."
   (unless astraea--init-finished
     (setq astraea--init-finished t)
+    ;; font: apply and persist across frames
+    (when astraea-font
+      (let ((spec (format "%s-%s" astraea-font astraea-font-size)))
+        (set-frame-font spec nil t)
+        (add-to-list 'default-frame-alist (cons 'font spec))))
     (astraea/modal--activate astraea-modal-style)
     (astraea/ui//finish)
     (run-hooks 'astraea-after-init-hook)

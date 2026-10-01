@@ -78,6 +78,15 @@ more features)."
 `copilot-language-server' from npm)."
   :type 'boolean)
 
+(defcustom astraea-font nil
+  "Default font, e.g. \"JetBrainsMono Nerd Font\" or \"Cascadia Code\".
+When nil, the system default is kept.  See `astraea-font-size'."
+  :type '(choice string (const nil)))
+
+(defcustom astraea-font-size 12
+  "Default font size in points (used with `astraea-font')."
+  :type 'number)
+
 (defcustom astraea-pre-init-hook nil
   "Run just before elpaca processes queues."
   :type 'hook)
