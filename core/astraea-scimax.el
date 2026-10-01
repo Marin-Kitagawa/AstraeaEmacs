@@ -210,7 +210,7 @@ pronunciations + definitions in a help buffer (no API key needed)."
               (let ((i 1))
                 (dolist (d (cdr (assoc "definitions" m)))
                   (insert (format "  %d. %s\n" i (cdr (assoc "definition" d))))
-                  (when-let ((ex (cdr (assoc "example" d))))
+                  (when-let* ((ex (cdr (assoc "example" d))))
                     (insert (format "     example: %s\n" ex)))
                   (setq i (1+ i)))
                 (insert "\n")))

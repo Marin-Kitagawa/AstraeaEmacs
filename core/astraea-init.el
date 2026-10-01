@@ -92,6 +92,7 @@
 (require 'astraea-present)
 (require 'astraea-manuscript)
 (require 'astraea-fun)
+(require 'astraea-lang-registry)
 
 ;; ── User configuration ────────────────────────────────────────────────────
 (defun astraea//seed-user-config ()
