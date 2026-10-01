@@ -99,5 +99,15 @@
       (treemacs-select-window)
     (dired default-directory)))
 
+;; ── Fullscreen cycling: normal → maximized → fullboth → normal ────────
+(defun astraea/cycle-fullscreen ()
+  "Cycle the frame state: normal → maximized → fullscreen → normal."
+  (interactive)
+  (pcase (frame-parameter nil 'fullscreen)
+    ('fullboth (set-frame-parameter nil 'fullscreen nil))
+    ((or 'maximized 'fullwidth) (set-frame-parameter nil 'fullscreen 'fullboth))
+    (_ (set-frame-parameter nil 'fullscreen 'maximized))))
+(global-set-key (kbd "<f11>") #'astraea/cycle-fullscreen)
+
 (provide 'astraea-ui)
 ;;; astraea-ui.el ends here

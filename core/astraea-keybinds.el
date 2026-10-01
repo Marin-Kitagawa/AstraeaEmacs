@@ -113,6 +113,7 @@ message instead of aborting bootstrap."
    "t w" #'whitespace-mode
    "t v" #'visual-line-mode
    "t m" #'astraea/toggle-modal-style
+   "t f" #'astraea/cycle-fullscreen
    ;; help (helpful-enhanced)
    "h f" #'helpful-function
    "h v" #'helpful-variable
