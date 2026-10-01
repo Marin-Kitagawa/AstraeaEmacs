@@ -56,8 +56,11 @@
                    elpaca-menu-org elpaca-tar))
       (require lib))))
 ;; Windows cannot create symlinks without Developer Mode/admin: copy instead.
+;; Also cap concurrent git clones — Git for Windows can crash with an
+;; access violation under heavy parallel load.
 (when (eq system-type 'windows-nt)
-  (elpaca-no-symlink-mode 1))
+  (elpaca-no-symlink-mode 1)
+  (setq elpaca-queue-limit 4))
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
 
