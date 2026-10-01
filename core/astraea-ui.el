@@ -33,6 +33,11 @@
     (when (fboundp 'nerd-icons-codicon)
       (setq dashboard-footer-icon
             (nerd-icons-codicon "nf-cod-sparkle" :height 1.2 :face 'nerd-icons-pink)))
+    ;; show the dashboard on launch (scratch fallback keeps batch sessions safe)
+    (setq initial-buffer-choice
+          (lambda ()
+            (or (get-buffer dashboard-buffer-name)
+                (get-buffer "*scratch*"))))
     (dashboard-setup-startup-hook)))
 
 ;; ── Modeline: mood-line (light, cute, zero doom) ──────────────────────

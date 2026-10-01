@@ -10,15 +10,17 @@
 
 ;; ── Org base ─────────────────────────────────────────────────────────────
 (elpaca org
-  (setq org-ellipsis " ▾"
+  (let ((agenda-dir (expand-file-name "org/agenda/" astraea-user-directory)))
+    (make-directory agenda-dir t)      ; must exist: org-agenda prompts on missing dirs
+    (setq org-ellipsis " ▾"
         org-hide-emphasis-markers t        ; with org-appear, they come back on cursor
         org-src-fontify-natively t
         org-src-tab-acts-natively t
         org-edit-src-content-indentation 0
         org-confirm-babel-evaluate nil     ; trust your own notebooks
-        org-agenda-files (list (expand-file-name "org/agenda/" astraea-user-directory))
+        org-agenda-files (list agenda-dir)
         org-latex-compiler "xelatex"
-        org-preview-latex-default-process 'dvisvgm))
+        org-preview-latex-default-process 'dvisvgm)))
 
 ;; ── Modern looks ────────────────────────────────────────────────────────
 (elpaca org-modern
