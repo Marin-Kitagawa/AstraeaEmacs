@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  syntax:
+    name: Paren & syntax check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: purcell/setup-emacs@master
+        with:
+          version: 31.1
+      - name: Check parens and syntax of all framework files
+        run: |
+          emacs --batch -Q -l tests/check-parens.el 2>&1 | tee syntax.log
+          ! grep -q PAREN-FAIL syntax.log
+
+  byte-compile:
+    name: Byte-compile framework
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: purcell/setup-emacs@master
+        with:
+          version: 31.1
+      - name: Byte-compile core, layers and tests (warnings allowed, errors fatal)
+        run: |
+          mkdir -p .elc-out
+          fail=0
+          for f in $(git ls-files '*.el'); do
+            case "$f" in *elpaca*) continue;; esac
+            out=$(emacs --batch -Q -f batch-byte-compile "$f" 2>&1) || { echo "ERROR in $f:"; echo "$out"; fail=1; }
+            if echo "$out" | grep -q "End of file during parsing"; then
+              echo "TRUNCATED: $f"; fail=1
+            fi
+          done
+          rm -rf .elc-out
+          exit $fail
+
+  bootstrap:
+    name: Batch bootstrap smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: purcell/setup-emacs@master
+        with:
+          version: 31.1
+      - name: Load framework in batch (core modules + user config, no package install)
+        run: |
+          cat > /tmp/ci-driver.el <<'EOF'
+          (setq user-emacs-directory default-directory)
+          (setq astraea--ci t)
+          (condition-case err
+              (progn
+                (load (expand-file-name "init.el" user-emacs-directory) nil t)
+                (unless (featurep 'astraea-scimax) (error "astraea-scimax not loaded"))
+                (unless (featurep 'astraea-transients) (error "astraea-transients not loaded"))
+                (message "CI: framework modules loaded OK"))
+            (error (message "CI-ERROR: %S" err) (kill-emacs 1)))
+          EOF
+          emacs --batch -Q -l /tmp/ci-driver.el

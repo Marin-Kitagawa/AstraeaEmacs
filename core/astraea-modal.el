@@ -64,12 +64,12 @@
    (list (intern (completing-read "Modal style: " '(evil meow hybrid)))))
   (cl-case style
     (meow
-     (when (fboundp 'evil-mode) (evil-mode -1))
-     (meow-global-mode 1)
+     (when (and (fboundp 'meow-global-mode) (fboundp 'astraea//install-leader))
+       (meow-global-mode 1))
      (message "Astraea: meow mode"))
     ((evil hybrid)
-     (when (fboundp 'meow-global-mode) (meow-global-mode -1))
-     (evil-mode 1)
+     (when (fboundp 'evil-mode)
+       (evil-mode 1))
      (when (eq style 'hybrid)
        (setcar evil-insert-state-map "ESC" nil))
      (message "Astraea: %s mode" style))

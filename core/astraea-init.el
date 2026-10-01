@@ -118,21 +118,27 @@
                                 always (memq (elpaca<-status e)
                                              '(finished failed))))))
 
+(defvar astraea--ci nil
+  "When non-nil (CI smoke tests), `astraea/init' skips package queue
+processing and finalization — only module loading is validated.")
+
 (defun astraea/init ()
   "Complete Astraea bootstrap. Call this at the END of your user init file."
   (interactive)
   (astraea/layers--enable-all)
-  (astraea//install-leader)
-  (run-hooks 'astraea-pre-init-hook)
-  (elpaca-process-queues)
-  ;; Finish when elpaca's post-init hook fires (async first install)…
-  (add-hook 'elpaca-after-init-hook #'astraea//finish-init)
-  (add-hook 'elpaca--post-queues-hook #'astraea//finish-init)
-  ;; …or immediately when every order was already built (warm start).
-  (if (astraea//all-orders-terminal-p)
-      (astraea//finish-init)
-    ;; Fallback: idle timer in case elpaca's hook conditions never align.
-    (run-with-idle-timer 30 nil #'astraea//finish-init)))
+  (if astraea--ci
+      (message "CI: astraea/init registered (package processing skipped)")
+    (astraea//install-leader)
+    (run-hooks 'astraea-pre-init-hook)
+    (elpaca-process-queues)
+    ;; Finish when elpaca's post-init hook fires (async first install)…
+    (add-hook 'elpaca-after-init-hook #'astraea//finish-init)
+    (add-hook 'elpaca--post-queues-hook #'astraea//finish-init)
+    ;; …or immediately when every order was already built (warm start).
+    (if (astraea//all-orders-terminal-p)
+        (astraea//finish-init)
+      ;; Fallback: idle timer in case elpaca's hook conditions never align.
+      (run-with-idle-timer 30 nil #'astraea//finish-init))))
 
 (defun astraea//finish-init ()
   "Finalize Astraea: theme, leader keys, layer configs.  Runs once."
