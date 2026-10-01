@@ -84,12 +84,34 @@
 (elpaca treesit-fold)       ; UFO equivalent on Emacs 30+ treesit
 (elpaca electric-operator)
 
+;; ── tab-bar theming: match the active dark theme ────────────────────────
+(defun astraea/ui//apply-tab-bar-faces ()
+  "Style the tab-bar to match the active theme.
+Derives colors from the `default' face so any theme stays consistent."
+  (let* ((bg (face-attribute 'default :background nil 'default))
+         (fg (face-attribute 'default :foreground nil 'default))
+         (dim (face-attribute 'font-lock-comment-face :foreground nil 'default)))
+    (set-face-attribute 'tab-bar nil :background bg :foreground fg :height 0.95)
+    (set-face-attribute 'tab-bar-tab nil
+                        :background bg :foreground fg
+                        :weight 'bold
+                        :box `(:line-width 3 :color ,bg :style nil))
+    (set-face-attribute 'tab-bar-tab-inactive nil
+                        :background bg :foreground dim
+                        :box `(:line-width 3 :color ,bg :style nil))
+    (set-face-attribute 'tab-line nil :background bg :foreground fg)))
+
+;; restyle automatically whenever a theme is (re)loaded
+(advice-add 'load-theme :after
+            (lambda (&rest _) (astraea/ui//apply-tab-bar-faces)))
+
 (defun astraea/ui//finish ()
   "Final UI pass, after all packages are loaded."
   (ignore-errors (load-theme astraea-theme t))
   (when (fboundp 'astraea//bind-core-keys)
     (astraea//bind-core-keys)
-    (astraea/layers--run-config)))
+    (astraea/layers--run-config))
+  (astraea/ui//apply-tab-bar-faces))
 
 ;; convenient tree toggle bound to leader
 (defun astraea/toggle-file-tree ()

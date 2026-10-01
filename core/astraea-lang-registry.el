@@ -17,11 +17,10 @@
   :type 'file)
 
 (defcustom astraea-lang-default-enabled 'all
-  "Languages enabled automatically at startup.
-Symbol `all' enables every language in the registry; a list of
-symbols enables just those; nil disables auto-enable."
-  "Languages enabled automatically at startup."
-  :type '(repeat symbol))
+  "Languages enabled automatically at startup.  Symbol `all' enables
+every language in the registry; a list of symbols enables just
+those; nil disables auto-enable."
+  :type '(choice (const all) (repeat symbol) (const nil)))
 
 (defconst astraea-lang-registry
   '(
