@@ -38,11 +38,16 @@
           (user-error "Astraea: failed to clone elpaca; see *elpaca-bootstrap*: %s"
                       (buffer-string))))))
   (add-to-list 'load-path source)
-  ;; The source repo does not ship generated autoloads; load the library
-  ;; directly.  After elpaca builds itself, builds/elpaca has autoloads.
+  ;; The source repo does not ship generated autoloads; load every library
+  ;; explicitly in dependency order.  After elpaca builds itself,
+  ;; builds/elpaca has autoloads and we use those instead.
   (if (file-exists-p (expand-file-name "elpaca-autoloads.el" source))
       (require 'elpaca-autoloads)
-    (require 'elpaca)))
+    (require 'elpaca)                 ; pulls elpaca-process
+    (dolist (lib '(elpaca-ui elpaca-file elpaca-git elpaca-info elpaca-log
+                   elpaca-manager elpaca-menu-elpa elpaca-menu-melpa
+                   elpaca-menu-org elpaca-tar))
+      (require lib))))
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
 
