@@ -22,22 +22,23 @@
            :ref nil :depth 1 :wait t
            :files (:defaults "elpaca-test.el" (:exclude "extensions"))
            :build (:not elpaca--activate-package)))
-(when-let* ((repo (expand-file-name "elpaca/" elpaca-repos-directory))
-            (build (expand-file-name "elpaca/" elpaca-builds-directory))
-            (order (cdr elpaca-order))
-            ((add-to-list 'load-path (if (file-exists-p build) build repo))))
-  (unless (file-exists-p build)
-    (require 'url)
-    (let ((buffer (url-retrieve-synchronously
-                   (format "https://github.com/progfolio/elpaca/archive/refs/heads/%s.zip" (alist-get :ref order 'main))
-                   nil nil 30)))
-      (unwind-protect
-          (let ((default-directory elpaca-repos-directory))
-            (when buffer (with-current-buffer buffer (elpaca-unpack (alist-get :ref order 'main))))))
-        (when buffer (kill-buffer buffer)))))
-(when-let* ((buffer (find-buffer-visiting (expand-file-name "elpaca-test.el" repo))))
-  (load buffer))
-(require 'elpaca-autoloads nil t)
+
+(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+       (build (expand-file-name "elpaca/" elpaca-builds-directory))
+       (source (if (file-exists-p build) build repo)))
+  ;; Clone elpaca via git if absent (works everywhere git exists).
+  (unless (file-exists-p repo)
+    (make-directory elpaca-repos-directory t)
+    (let ((log (get-buffer-create "*elpaca-bootstrap*")))
+      (unless (zerop (call-process "git" nil log t
+                                   "clone" "--filter=blob:none"
+                                   "https://github.com/progfolio/elpaca.git"
+                                   repo))
+        (with-current-buffer log
+          (user-error "Astraea: failed to clone elpaca; see *elpaca-bootstrap*: %s"
+                      (buffer-string))))))
+  (add-to-list 'load-path source))
+(require 'elpaca-autoloads)
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
 
