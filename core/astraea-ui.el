@@ -4,7 +4,7 @@
 ;;   alpha-nvim        → dashboard.el
 ;;   noice/notify      → via +posframe which-key & transient menus
 ;;   neo-tree          → treemacs (SPC e tree via dirvish/dired also)
-;;   bufferline        → mood-line / doom-modeline + tab-bar workspaces
+;;   bufferline        → mood-line + tab-bar workspaces
 ;;   indent guides     → indent-bars
 ;;   web-devicons      → nerd-icons
 ;;   UFO folding       → treesit-fold
@@ -28,15 +28,13 @@
           initial-buffer-choice (lambda () (get-buffer dashboard-buffer-name)))
     (dashboard-setup-startup-hook)))
 
-;; ── Modeline (bufferline.nvim equivalent lives in tab-bar) ───────────────
-(elpaca doom-modeline
-  (setq doom-modeline-height 32
-        doom-modeline-bar-width 4
-        doom-modeline-icon t
-        doom-modeline-lsp t
-        doom-modeline-modal-icon t
-        doom-modeline-buffer-file-name-style 'relative-from-project)
-  (doom-modeline-mode 1))
+;; ── Modeline: mood-line (light, cute, zero doom) ──────────────────────
+(elpaca mood-line
+  (setq mood-line-show-eol-style t
+        mood-line-show-indent-style t)
+  (when (fboundp 'mood-line-format-text-packed)
+    (setq mood-line-format (mood-line-format-text-packed)))
+  (mood-line-mode 1))
 
 (when (display-graphic-p)
   (tab-bar-mode 1)
@@ -53,10 +51,19 @@
 (elpaca treemacs-icons-dired
   (treemacs-icons-dired-mode))
 
-;; ── Theme & syntax polish ────────────────────────────────────────────────
-(elpaca doom-themes)
-(elpaca catppuccin-theme)   ; matches your nvim catppuccin installs
-(elpaca kanagawa-themes)     ; matches your nvim kanagawa (theme: kanagawa)
+;; ── Themes: beautiful, feminine, cute — no doom, ever ────────────────
+(elpaca catppuccin-theme)             ; pastel mocha/frappé (theme: catppuccin)
+(elpaca kanagawa-themes)              ; wave-art fallback (theme: kanagawa)
+(elpaca ef-themes)                    ; Protesilaos collection — ef-summer,
+                                      ; ef-rosa, ef-cyprus, ef-elea… (GNU ELPA)
+(elpaca moe-theme)                    ; cheerful, bubbly
+(elpaca sakura-theme)                 ; soft cherry blossom
+(elpaca cherry-blossom-theme)         ; sakura pink
+(elpaca pink-bliss-uwu-theme)         ; unapologetically pink uwu
+(elpaca pastelmac-theme)              ; pastel macOS
+(elpaca bubbleberry-theme)            ; juicy purple
+(elpaca lavender-theme)               ; gentle lavender
+(elpaca kaolin-themes)                ; soft pastel set (kaolin-* variants)
 (elpaca indent-bars)
 (elpaca treesit-fold)       ; UFO equivalent on Emacs 30+ treesit
 (elpaca electric-operator)

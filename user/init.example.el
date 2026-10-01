@@ -11,7 +11,9 @@
 ;; ── 2. Backends ──────────────────────────────────────────────────────────
 (setq astraea-lsp-backend 'eglot          ; or 'lsp-mode
       astraea-completion-backend 'corfu   ; or 'company
-      astraea-theme 'catppuccin           ; catppuccin, kanagawa, doom-one…
+      astraea-theme 'ef-summer            ; pastel pink — also: sakura,
+                                          ; pink-bliss-uwu, moe-light,
+                                          ; cherry-blossom, catppuccin…
       astraea-dashboard-enabled t
       astraea-startup-benchmark t)        ; print startup time when ready
 

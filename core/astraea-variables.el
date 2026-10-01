@@ -33,8 +33,12 @@ installed (smaller footprint, faster startup)."
   "Local leader key for mode-specific keybinds."
   :type 'key)
 
-(defcustom astraea-theme 'doom-one
-  "Default theme.  Set to a symbol loaded by `load-theme'."
+(defcustom astraea-theme 'ef-summer
+  "Default theme.  Cute/feminine picks: ef-summer (pastel pink),
+ef-rosa, sakura, cherry-blossom, pink-bliss-uwu, pastelmac,
+bubbleberry, lavender, moe-light, catppuccin.  Set to a symbol
+loaded by `load-theme'.  Browse all with `ef-themes-select' or
+`load-theme' + TAB."
   :type 'symbol)
 
 (defcustom astraea-dashboard-enabled t
