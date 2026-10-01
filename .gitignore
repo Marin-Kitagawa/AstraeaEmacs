@@ -4,3 +4,6 @@ history
 out.txt
 err.txt
 *~
+
+/server
+/server/
