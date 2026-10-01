@@ -9,7 +9,9 @@
             (insert-file-contents f)
             (goto-char (point-min))
             (while t (read (current-buffer))))
-        (end-of-file nil)
+        (end-of-file
+         (message "READ-FAIL %s: truncated (end-of-file during parsing)"
+                  (file-name-nondirectory f)))
         (error (message "READ-FAIL %s (line %d): %S"
                         (file-name-nondirectory f)
                         (line-number-at-pos (point)) err)))))

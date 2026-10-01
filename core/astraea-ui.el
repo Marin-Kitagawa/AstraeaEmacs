@@ -24,8 +24,7 @@
           dashboard-vertically-center-content t
           dashboard-set-heading-icons t
           dashboard-set-file-icons t
-          dashboard-display-icons-p #'icons-displayable-p
-          initial-buffer-choice (lambda () (get-buffer dashboard-buffer-name)))
+          dashboard-display-icons-p #'icons-displayable-p)
     (dashboard-setup-startup-hook)))
 
 ;; ── Modeline: mood-line (light, cute, zero doom) ──────────────────────
