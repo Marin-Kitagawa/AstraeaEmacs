@@ -44,7 +44,8 @@
         meow-selection-command-fallback
         '((meow-change . meow-change-char)
           (meow-save . meow-save-empty)))
-  (meow-setup))
+  ;; meow works out of the box; craft a custom `meow-setup' in your user
+  ;; config (~/.astraea.d/init.el) if you want a custom normal-state layout.)
 
 ;; ── Engine selection ──────────────────────────────────────────────────────
 (defun astraea/modal--activate (style)

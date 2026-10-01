@@ -63,6 +63,7 @@
            "%?"
            :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
            :unnarrowed t)))
+  (make-directory org-roam-directory t)
   (org-roam-db-autosync-mode 1))
 
 ;; ── Export & publishing ────────────────────────────────────────────────

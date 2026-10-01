@@ -56,7 +56,7 @@ The **same** `SPC` leader map works under both engines. Supported styles:
 
 Mirrors AstroNvim conventions: `SPC f f` find file, `SPC b b` buffers,
 `SPC s g` ripgrep, `SPC c a` code action, `SPC e` diagnostics, `SPC g g`
-magit, `SPC j j` avy-jump (flash.nvim), `SPC u` toggles, `SPC SPC` M-x.
+magit, `SPC j j` avy-jump (flash.nvim), `SPC t` toggles, `SPC SPC` M-x.
 Transient menus: `SPC g` → git menu, buffers, workspaces — all
 which-key-discoverable.
 

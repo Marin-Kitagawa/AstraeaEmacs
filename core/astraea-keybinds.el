@@ -27,10 +27,12 @@
 
 (defun astraea/leader-def (key def &rest bindings)
   "Define KEY→DEF in `astraea-leader-map', then BINDINGS pairs.
-KEY is passed through `kbd'.  DOC is used as which-key label when
-BINDINGS ends with a string."
+KEY is passed through `kbd'.  A single invalid binding logs a
+message instead of aborting bootstrap."
   (while key
-    (define-key astraea-leader-map (kbd key) def)
+    (condition-case err
+        (define-key astraea-leader-map (kbd key) def)
+      (error (message "Astraea: leader binding %s failed: %s" key (error-message-string err))))
     (setq key (pop bindings) def (pop bindings))))
 
 (defun astraea//bind-core-keys ()
@@ -101,16 +103,16 @@ BINDINGS ends with a string."
    "w =" #'balance-windows
    "w o" #'other-frame
    ;; tree & workspaces (neo-tree toggle / grapple menus)
-   "t t" #'astraea/toggle-file-tree
+   "f t" #'astraea/toggle-file-tree
    "T T" #'astraea/transient-workspace
    "T a" #'astraea/workspace-add
    "T s" #'astraea/workspace-switch
-   ;; toggles (astronvim SPC u)
-   "u l" #'display-line-numbers-mode
-   "u r" #'read-only-mode
-   "u w" #'whitespace-mode
-   "u v" #'visual-line-mode
-   "u t" #'astraea/toggle-modal-style
+   ;; toggles (spacemacs-style SPC t prefix)
+   "t l" #'display-line-numbers-mode
+   "t r" #'read-only-mode
+   "t w" #'whitespace-mode
+   "t v" #'visual-line-mode
+   "t m" #'astraea/toggle-modal-style
    ;; help
    "h f" #'describe-function
    "h v" #'describe-variable
