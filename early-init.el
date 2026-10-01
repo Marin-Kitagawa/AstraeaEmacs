@@ -52,7 +52,10 @@
         (horizontal-scroll-bars . nil)
         (background-color . "#1a1b26")
         (foreground-color . "#c0caf5")
-        (alpha . 97)))
+        (alpha . 97)
+        (fullscreen . maximized)))  ; start maximized — delete this line for normal windows
+
+;; interactive toggle anytime: M-x toggle-frame-maximized
 
 (provide 'early-init)
 ;;; early-init.el ends here
