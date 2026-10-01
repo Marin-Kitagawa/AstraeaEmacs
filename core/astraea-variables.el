@@ -59,6 +59,19 @@ more features)."
 `company'."
   :type '(radio (const corfu) (const company)))
 
+(defcustom astraea-wakatime-enabled nil
+  "Enable WakaTime tracking (requires the `wakatime-cli' binary)."
+  :type 'boolean)
+
+(defcustom astraea-discord-presence-enabled nil
+  "Enable Discord rich presence via elcord (presence.nvim equivalent)."
+  :type 'boolean)
+
+(defcustom astraea-copilot-enabled nil
+  "Enable GitHub Copilot in programming buffers (requires
+`copilot-language-server' from npm)."
+  :type 'boolean)
+
 (defcustom astraea-pre-init-hook nil
   "Run just before elpaca processes queues."
   :type 'hook)

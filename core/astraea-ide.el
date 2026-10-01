@@ -82,10 +82,14 @@
     (ignore-errors (treesit-install-language-grammar lang))))
 
 ;; ── Project-wide search & replace (grug-far.nvim equivalent) ────────────
+(elpaca wgrep)                         ; edit grep/ripgrep results in place
 (defun astraea/project-replace ()
-  "Project-wide search and replace via consult + wgrep."
+  "Project-wide search, then edit the results buffer with wgrep."
   (interactive)
-  (consult-ripgrep (project-current t)))
+  (consult-ripgrep (project-current t))
+  (with-current-buffer "*xref*"
+    (when (fboundp 'wgrep-change-to-wgrep-mode)
+      (wgrep-change-to-wgrep-mode))))
 
 (provide 'astraea-ide)
 ;;; astraea-ide.el ends here

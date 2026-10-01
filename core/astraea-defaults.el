@@ -51,17 +51,12 @@
 
 ;; Undo: persistent, granular, with vundo tree visualization
 (elpaca undo-fu
-  (define-key global-map [remap-undo] nil)
   (global-set-key [remap undo] #'undo-fu-only-undo)
   (global-set-key [remap undo-redo] #'undo-fu-only-redo))
-(elpaca vundo)  ; SPC u u — undo tree (undotree.nvim equivalent)
-
-;; Better escape (better-escape.nvim equivalent): jk exits insert fast
-(defun astraea//install-better-escape ()
-  "Make `jj' escape insert state quickly in evil."
-  (astraea/after! evil
-    (define-key evil-insert-state-map (kbd "j") #'evil-next-visual-line) ; placeholder
-    (setq evil-escape-key-sequence nil)))
+(elpaca undo-fu-session                ; undo history survives restarts
+  (setq undo-fu-session-incompatible-files '("/COMMIT_EDITMSG\\'" "/git-rebase-take\\'"))
+  (undo-fu-session-global-mode 1))
+(elpaca vundo)  ; SPC b u — undo tree (undotree.nvim equivalent)
 
 ;; Server: emacsclient support (skip in batch/non-GUI sessions)
 (require 'server)

@@ -83,6 +83,7 @@
 (require 'astraea-ide)
 (require 'astraea-org)
 (require 'astraea-project)
+(require 'astraea-integrations)
 
 ;; ── User configuration ────────────────────────────────────────────────────
 (defun astraea//seed-user-config ()

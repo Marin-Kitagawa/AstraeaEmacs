@@ -29,6 +29,9 @@
 (elpaca consult-dir)
 (elpaca nerd-icons-completion)
 
+;; ── Helpful: richer *Help* buffers (h f / h v / h k) ────────────────
+(elpaca helpful)
+
 (with-eval-after-load 'vertico
   (define-key vertico-map (kbd "C-j") #'vertico-next)
   (define-key vertico-map (kbd "C-k") #'vertico-previous))

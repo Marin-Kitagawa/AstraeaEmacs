@@ -24,10 +24,8 @@
         evil-search-module 'evil-search
         evil-ex-search-persistent-highlight nil)
   (require 'evil)
-  ;; ESC counts as the escape sequence fast-exit (better-escape equivalent)
-  (when (boundp 'evil-escape-key-sequence)
-    (setq evil-escape-key-sequence "jk"
-          evil-escape-delay 0.15)))
+  (when (fboundp 'evil-escape-mode)
+    (evil-escape-mode 1)))
 
 (elpaca evil-collection
   (evil-collection-init))
@@ -36,6 +34,18 @@
   (global-evil-surround-mode 1))
 
 (elpaca evil-numbers)   ; g C-a increments (flash.nvim-style numbering)
+
+;; better-escape.nvim equivalent: "jk" exits insert state
+(elpaca evil-escape
+  (setq evil-escape-key-sequence "jk"
+        evil-escape-delay 0.15
+        evil-escape-excluded-modes '(dired-mode)
+        evil-escape-unordered-key-sequence t)
+  (evil-escape-mode 1))
+
+;; comment.nvim equivalent: gcc/gc operators
+(elpaca evil-commentary
+  (evil-commentary-mode 1))
 
 ;; ── meow ──────────────────────────────────────────────────────────────────
 (elpaca meow

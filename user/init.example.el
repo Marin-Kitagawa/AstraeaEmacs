@@ -40,7 +40,12 @@
 (astraea/leader-def
  "f p" #'(lambda () (interactive) (find-file "~/.astraea.d/init.el")))
 
-;; ── 6. Anything else — plain Emacs Lisp ─────────────────────────────────
+;; ── 6. Opt-in integrations ──────────────────────────────────────────
+;; (setq astraea-copilot-enabled t)            ; needs copilot-language-server (npm)
+;; (setq astraea-discord-presence-enabled t)   ; Discord rich presence (elcord)
+;; (setq astraea-wakatime-enabled t)           ; needs wakatime-cli on PATH
+
+;; ── 7. Anything else — plain Emacs Lisp ─────────────────────────────────
 ;; (setq org-cite-global-bibliography '("~/my-real-zotero.bib"))
 
 ;;; Bootstrap finishes here — keep this line LAST:

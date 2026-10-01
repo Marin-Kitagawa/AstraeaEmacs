@@ -24,7 +24,15 @@
           dashboard-vertically-center-content t
           dashboard-set-heading-icons t
           dashboard-set-file-icons t
-          dashboard-display-icons-p #'icons-displayable-p)
+          dashboard-display-icons-p #'icons-displayable-p
+          dashboard-banner-logo-title "✦  A S T R A E A  ✦"
+          dashboard-footer-messages
+          '("✨ balanced parens, serene mind ✨"
+            "🌙 SPC to explore — which-key shows the way"
+            "🌟 M-x astraea/set-modal-style to switch evil ⇄ meow anytime"))
+    (when (fboundp 'nerd-icons-codicon)
+      (setq dashboard-footer-icon
+            (nerd-icons-codicon "nf-cod-sparkle" :height 1.2 :face 'nerd-icons-pink)))
     (dashboard-setup-startup-hook)))
 
 ;; ── Modeline: mood-line (light, cute, zero doom) ──────────────────────

@@ -84,8 +84,15 @@ which-key-discoverable.
 | UFO folding | treesit-fold |
 | alpha-nvim dashboard | dashboard.el |
 | bufferline | tab-bar + doom-modeline |
-| better-escape | `jk` escape via evil-escape |
-| wakatime | `wakatime-mode` (one-line enable) |
+| better-escape | evil-escape (`jk` exits insert state) |
+| comment.nvim | evil-commentary (gcc / gc operators) |
+| nvim-autopairs | electric-pair-mode (built-in) |
+| copilot.lua | copilot (`astraea-copilot-enabled t`, opt-in) |
+| presence.nvim | elcord (`astraea-discord-presence-enabled t`, opt-in) |
+| wakatime | wakatime-mode (`astraea-wakatime-enabled t`, opt-in) |
+| asciidoc.nvim | adoc-mode |
+| persistent undo | undo-fu-session (undo survives restarts) + vundo |
+| cheatsheet.nvim | helpful help buffers + which-key + meow cheatsheet |
 
 ## Layers
 

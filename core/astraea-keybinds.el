@@ -113,10 +113,11 @@ message instead of aborting bootstrap."
    "t w" #'whitespace-mode
    "t v" #'visual-line-mode
    "t m" #'astraea/toggle-modal-style
-   ;; help
-   "h f" #'describe-function
-   "h v" #'describe-variable
-   "h k" #'describe-key
+   ;; help (helpful-enhanced)
+   "h f" #'helpful-function
+   "h v" #'helpful-variable
+   "h k" #'helpful-key
+   "h c" #'helpful-command
    "h m" #'describe-mode
    "h h" #'(lambda () (interactive) (info-emacs-manual))
    "h L" #'(lambda () (interactive) (astraea/list-layers))))
