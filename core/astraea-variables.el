@@ -45,6 +45,12 @@ loaded by `load-theme'.  Browse all with `ef-themes-select' or
   "Show an astronvim-style dashboard on startup."
   :type 'boolean)
 
+(defcustom astraea-dashboard-banner "etc/banner.png"
+  "Image file shown on the dashboard (spacemacs-style image banner).
+Relative paths resolve against `user-emacs-directory'.  Set to any
+PNG/JPG you like, or nil for the built-in ASCII logo."
+  :type '(choice file (const nil)))
+
 (defcustom astraea-startup-benchmark nil
   "Report startup time and slowest packages after init."
   :type 'boolean)

@@ -1,0 +1,56 @@
+direction: down
+
+minibuffer: {
+  label: "Minibuffer completion"
+  vertico: "vertico — vertical list"
+  orderless: "orderless — fuzzy multi-pattern"
+  marginalia: "marginalia — annotations"
+  consult: "consult — search/navigate commands"
+  embark: "embark — contextual actions"
+}
+blink: {label: "blink.cmp / coq_nvim"; shape: cylinder}
+
+inbuffer: {
+  label: "In-buffer completion"
+  corfu: "corfu — popup completion"
+  cape: "cape — completion-at-point extensions"
+  yasnippet: "yasnippet + snippets"
+  company: "company (alternative backend)"
+}
+
+minibuffer <- blink: "replaces"
+inbuffer <- blink: "replaces"
+
+ide: {
+  label: "IDE services"
+  eglot: "eglot (built-in) — default"
+  "lsp-mode": "lsp-mode — optional backend"
+  apheleia: "apheleia — async formatting (conform.nvim)"
+  dape: "dape — debugging (nvim-dap)"
+  flymake: "flymake + collection — diagnostics"
+  "eldoc-box": "eldoc-box — signature popups"
+}
+
+org: {
+  label: "scimax org stack"
+  jupyter: "jupyter — async notebooks"
+  citar: "citar + biblio — citations"
+  "cdlatex/auctex": "LaTeX editing"
+  "org-roam": "org-roam — zettelkasten"
+  "ox-pandoc/ox-hugo": "publishing"
+}
+
+tools: {
+  label: "tools & UI"
+  treemacs: "treemacs (neo-tree)"
+  dirvish: "dirvish (yazi)"
+  magit: "magit (layer)"
+  avy: "avy (flash.nvim)"
+  vundo: "vundo + undo-fu-session (undotree)"
+  dashboard: "dashboard (alpha-nvim)"
+}
+
+minibuffer -> ide: "serves"
+inbuffer -> ide: "serves"
+minibuffer -> org: "serves"
+minibuffer -> tools: "serves"

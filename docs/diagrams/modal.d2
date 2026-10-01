@@ -1,0 +1,45 @@
+direction: right
+
+astraea-modal.el: {
+  "installs BOTH engines once"
+  "runtime switching — no restart"
+}
+
+engines: {
+  evil: {
+    "full Vim emulation"
+    "evil-collection coverage"
+    "jk fast-escape"
+    "evil-commentary / surround / numbers"
+  }
+  meow: {
+    "modern native modal"
+    "keypad-driven selection"
+    "works out of the box"
+  }
+  hybrid: {
+    "evil + native insert bindings"
+  }
+}
+
+astraea-modal.el -> engines: "astraea/set-modal-style"
+
+leader: {
+  shape: circle
+  label: "SPC"
+}
+
+engines -> leader: "same shared map\n(astraea-leader-map)"
+leader -> whichkey: "which-key discovery"
+whichkey: {shape: page; label: "*which-key*"}
+leader -> transient: "discoverable menus"
+transient: {
+  "SPC T — workspaces"
+  "git / buffer menus"
+}
+
+persist: {
+  shape: cylinder
+  "astraea-modal-style defcustom"
+}
+astraea-modal.el -> persist: "your choice survives"

@@ -1,0 +1,75 @@
+direction: right
+
+SPC: {
+  shape: circle
+  label: "SPC"
+  tooltip: "shared leader key — works in evil AND meow"
+}
+
+SPC -> "SPC SPC": "M-x (execute command)"
+SPC -> b: "buffers"
+SPC -> f: "files"
+SPC -> s: "search"
+SPC -> j: "jump (avy)"
+SPC -> c: "code"
+SPC -> e: "diagnostics"
+SPC -> w: "windows"
+SPC -> t: "toggles"
+SPC -> g: "git (layer)"
+SPC -> n: "notes/org"
+SPC -> m: "local commands"
+SPC -> T: "workspaces"
+SPC -> h: "help (helpful)"
+
+b: {
+  "b b — consult-buffer"
+  "b d — kill buffer"
+  "b s — save"
+  "b u — vundo tree"
+}
+f: {
+  "f f — find file"
+  "f r — recent files"
+  "f t — file tree"
+  "f R — rename file+buffer"
+  "f d — dirvish"
+}
+s: {
+  "s b — line (this buffer)"
+  "s g — ripgrep project"
+  "s i — imenu symbols"
+  "s o — outline"
+}
+c: {
+  "c a — code actions"
+  "c r — rename symbol"
+  "c f — format buffer"
+}
+w: {
+  "w v/s — vsplit/split"
+  "w m — maximize"
+  "w = — balance"
+}
+t: {
+  "t l — line numbers"
+  "t w — whitespace"
+  "t v — visual line"
+  "t m — switch evil ⇄ meow"
+}
+g: {
+  "g g — magit status"
+  "g c — commit"
+  "g p — push"
+  "g t — timemachine"
+}
+n: {
+  "n r — org-roam find"
+  "n c — citar library"
+  "n n — capture"
+  "n p — jupyter session"
+}
+T: {shape: oval}
+h: {
+  "h f/v/k/c — helpful"
+  "h L — list layers"
+}

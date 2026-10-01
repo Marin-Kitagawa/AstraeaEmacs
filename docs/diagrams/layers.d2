@@ -1,0 +1,45 @@
+direction: right
+
+user config: {
+  shape: document
+  "~/.astraea.d/init.el"
+}
+
+file layers: {
+  grid-rows: 3
+  "+tools/git": {
+    magit; "git-timemachine"; "diff-hl"; "magit-todos"
+  }
+  "+lang/emacs-lisp": {
+    "elisp-demos"; suggest; macrostep
+  }
+  "+lang/python": {
+    pyvenv; jupyter
+  }
+}
+
+inline layer: {
+  "declared in user config"
+  "astraea-layer! +personal/writeroom"
+}
+
+user config -> file layers: "astraea/enable-layer"
+user config -> inline layer: "astraea-layer!"
+
+registry: {
+  shape: cylinder
+  "symbol plist: :packages :init :config :keybinds"
+}
+
+file layers -> registry: "astraea-layer! stores"
+inline layer -> registry: "stores"
+
+boot: {
+  ":init forms — before packages"
+  ":config — after activation"
+  ":keybinds — after leader map"
+}
+
+registry -> boot: "astraea/layers--enable-all"
+boot -> SPC: "hooks into leader map"
+SPC: {shape: circle; label: "SPC"}

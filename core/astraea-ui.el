@@ -18,21 +18,25 @@
 ;; ── Dashboard (alpha-nvim equivalent) ────────────────────────────────────
 (elpaca dashboard
   (when astraea-dashboard-enabled
-    (setq dashboard-items '((recents . 10) (projects . 8) (bookmarks . 5) (agenda . 5))
-          dashboard-startup-banner 'logo
-          dashboard-center-content t
-          dashboard-vertically-center-content t
-          dashboard-set-heading-icons t
-          dashboard-set-file-icons t
-          dashboard-display-icons-p #'icons-displayable-p
-          dashboard-banner-logo-title "✦  A S T R A E A  ✦"
-          dashboard-footer-messages
-          '("✨ balanced parens, serene mind ✨"
-            "🌙 SPC to explore — which-key shows the way"
-            "🌟 M-x astraea/set-modal-style to switch evil ⇄ meow anytime"))
-    (when (fboundp 'nerd-icons-codicon)
-      (setq dashboard-footer-icon
-            (nerd-icons-codicon "nf-cod-sparkle" :height 1.2 :face 'nerd-icons-pink)))
+    (let ((banner (if (and astraea-dashboard-banner
+                           (not (file-name-absolute-p astraea-dashboard-banner)))
+                      (expand-file-name astraea-dashboard-banner user-emacs-directory)
+                    astraea-dashboard-banner)))
+      (setq dashboard-items '((recents . 10) (projects . 8) (bookmarks . 5) (agenda . 5))
+            dashboard-startup-banner (if (and banner (file-exists-p banner)) banner 'logo)
+            dashboard-banner-logo-title "✦  A S T R A E A  ✦"
+            dashboard-center-content t
+            dashboard-vertically-center-content t
+            dashboard-set-heading-icons t
+            dashboard-set-file-icons t
+            dashboard-display-icons-p #'icons-displayable-p
+            dashboard-footer-messages
+            '("✨ balanced parens, serene mind ✨"
+              "🌙 SPC to explore — which-key shows the way"
+              "🌟 M-x astraea/set-modal-style to switch evil ⇄ meow anytime"))
+      (when (fboundp 'nerd-icons-codicon)
+        (setq dashboard-footer-icon
+              (nerd-icons-codicon "nf-cod-sparkle" :height 1.2 :face 'nerd-icons-pink))))
     ;; show the dashboard on launch (scratch fallback keeps batch sessions safe)
     (setq initial-buffer-choice
           (lambda ()

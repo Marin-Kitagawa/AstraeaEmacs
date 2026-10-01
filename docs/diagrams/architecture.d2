@@ -1,0 +1,46 @@
+direction: down
+
+runemacs.exe: {shape: person}
+emacs.exe: {shape: cylinder}
+
+runemacs.exe -> emacs.exe: launches GUI
+emacs.exe -> early-init.el: "1. earliest init (GUI inhibited)"
+early-init.el: {
+  GC deferral: "gc-cons-threshold = most-positive-fixnum"
+  file handlers: "file-name-handler-alist stripped"
+  native-comp: "async AOT compilation enabled"
+  frame: "zero-flicker, chrome removed"
+}
+early-init.el -> init.el: "2. entry point"
+init.el: {
+  load-path: "core/ + layers/"
+  user config: "astraea/load-user-config"
+}
+init.el -> astraea-init.el: "3. framework bootstrap"
+astraea-init.el: {
+  elpaca: "git-clone bootstrap + autoloads"
+  "elpaca-no-symlink-mode (Windows)"
+  "elpaca-queue-limit = 4"
+  core modules: "variables, lib, performance,\\ndefaults, layers, modal, keybinds,\\nui, completion, ide, org,\\nproject, integrations"
+}
+astraea-init.el -> user-init: "4. ~/.astraea.d/init.el"
+user-init: {
+  preferences: "modal, theme, backends"
+  "layer setup": "astraea/enable-layer"
+  personal: "keybinds, settings"
+}
+user-init -> astraea-init: "5. (astraea/init)"
+astraea-init.el -> elpaca-queue: "6. elpaca-process-queues"
+elpaca-queue: {
+  parallel: "≤4 concurrent orders"
+  install: "clone → build → compile → activate"
+  retry: "failed orders re-queued on restart"
+}
+elpaca-queue -> finish-init: "7. astraea//finish-init"
+finish-init: {
+  modal: "evil / meow / hybrid activated"
+  theme: "load-theme astraea-theme"
+  leader: "SPC map installed"
+  "layer configs": ":config + :keybinds run"
+  dashboard: "displayed in initial window"
+}

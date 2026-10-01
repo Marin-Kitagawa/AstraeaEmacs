@@ -1,0 +1,921 @@
+= Astraea Emacs
+:toc: left
+:toclevels: 4
+:sectnums:
+:icons: font
+:imagesdir: docs/images
+
+✦ *Astraea Emacs* ✦ — _the most feature-rich, most performant Emacs framework._
+
+Astraea fuses the best of three worlds:
+
+[cols="1,3"]
+|===
+| source | what it contributes
+
+| *Spacemacs*
+| layer system, `SPC`-leader keymaps, transient discoverable menus, which-key
+
+| *scimax*
+| scientific org stack: jupyter notebooks, citar citations, CDLaTeX/AUCTeX, org-roam, pandoc publishing
+
+| *AstroNvim*
+| polished dashboard/modeline/tree UI, LSP + formatter + debugger toolchain, lazy-first performance
+|===
+
+…plus a *runtime-switchable modal engine* (zetta-style): evil and meow are both
+installed, share one keymap, and can be swapped with a single command.
+
+"""
+
+== 1. Install
+
+[cols="1,2"]
+|===
+| Requirement | Notes
+
+| *Emacs 30+*
+| 31 recommended — ships built-in treesit, eglot, editorconfig
+
+| Git
+| elpaca clones via git; also used for the framework bootstrap
+
+| A Nerd Font
+| recommended — icons in modeline, tree, dashboard
+
+| pwsh (Windows)
+| UTF-8 shell integration is preconfigured
+
+| ripgrep
+| for `SPC s g` project search
+|===
+
+=== 1.1 Standard install
+
+[source,powershell]
+----
+git clone https://github.com/astraea-emacs/astraea ~/projects/astraea-emacs
+runemacs.exe   # or: emacs --init-directory ~/projects/astraea-emacs
+----
+
+The first launch installs all packages in parallel through **elpaca** (async
+package manager with native-comp integration). Your configuration is seeded to
+`~/.astraea.d/init.el` — the framework directory stays pristine, so framework
+upgrades never clobber your personal setup.
+
+=== 1.2 Windows: make `runemacs.exe` pick up Astraea automatically
+
+Create an NTFS *directory junction* (no admin or Developer Mode required):
+
+[source,powershell]
+----
+Rename-Item C:\Users\Ahri\.emacs.d .emacs.d.pre-astraea   # if it exists
+New-Item -ItemType Junction -Path C:\Users\Ahri\.emacs.d `
+         -Target C:\Users\Ahri\projects\astraea-emacs
+----
+
+After this, plain `runemacs.exe` loads Astraea natively. A real symlink also
+works if you have Developer Mode enabled.
+
+=== 1.3 Updating
+
+Run `M-x elpaca-update-all`, or restart — failed orders are retried
+automatically. Inspect anything with `M-x elpaca-manager`.
+
+"""
+
+== 2. Performance philosophy
+
+Astraea treats startup time and idle memory as first-class features:
+
+* `early-init.el` defers garbage collection, strips file-name handlers, and
+  removes frame chrome before the GUI exists.
+* **Every** package defers until first use (`:commands`, `:hook`, `:after`).
+* elpaca installs and AOT-native-compiles packages **in parallel**
+  (`elpaca-queue-limit 4` on Windows to keep `git.exe` stable).
+* `gcmh` throttles GC at idle; extra collection runs on frame focus loss.
+* All state lives outside `user-emacs-directory` via `no-littering`.
+* `M-x astraea/report-startup-time` and `M-x astraea/profile-startup`
+  give measurable feedback.
+
+"""
+
+== 3. Architecture
+
+The startup pipeline is linear and fully traceable; every stage is a single
+inspectable function.
+
+image::architecture.svg[Astraea startup pipeline]
+
+Warm starts (everything already built) run `astraea//finish-init`
+synchronously inside `astraea/init`; cold first installs defer it to elpaca's
+post-queue hooks and an idle-timer fallback.
+
+=== 3.1 Module map
+
+[cols="1,2"]
+|===
+| module | responsibility
+
+| `astraea-variables`
+| every defcustom: modal style, backends, theme, banner, opt-in toggles
+
+| `astraea-lib`
+| `astraea/after!`, `astraea/add-hook!`, `astraea/setq!`, buffer/file utils
+
+| `astraea-performance`
+| gcmh, no-littering, focus-loss GC, startup profiler and report
+
+| `astraea-defaults`
+| encoding, UTF-8 pwsh shell (Windows), editing QoL, undo stack, electric-pair
+
+| `astraea-layers`
+| `astraea-layer!` registry, file layers, enable/run protocol
+
+| `astraea-modal`
+| evil + meow co-installation, runtime `astraea/set-modal-style`
+
+| `astraea-keybinds`
+| shared `astraea-leader-map`, transient menus, which-key
+
+| `astraea-ui`
+| dashboard + image banner, mood-line, treemacs, themes, folding, icons
+
+| `astraea-completion`
+| vertico/orderless/marginalia/consult/embark + corfu/cape/yasnippet
+
+| `astraea-ide`
+| eglot/lsp-mode, apheleia, dape, flymake, treesit remapping, wgrep
+
+| `astraea-org`
+| scimax stack: jupyter, citar, cdlatex/auctex, org-roam, export, org-download
+
+| `astraea-project`
+| project.el, tab-bar workspaces, dirvish, grip, eshell launcher
+
+| `astraea-integrations`
+| opt-in bridges: copilot, elcord (Discord), wakatime, editorconfig
+|===
+
+"""
+
+== 4. Modal editing (zetta-style switching)
+
+Both engines are installed together; your muscle memory never breaks because
+**the same `SPC` leader map works under both**.
+
+[source]
+----
+M-x astraea/set-modal-style RET meow RET   ; live switch, no restart
+M-x astraea/toggle-modal-style             ; or SPC t m
+----
+
+[cols="1,2,2"]
+|===
+| style | engine | best for
+
+| `evil`
+| full Vim emulation (evil-collection everywhere)
+| spacemacs/Vim muscle memory
+
+| `meow`
+| modern native modal, keypad + selection-first
+| Emacs-native feel with modal editing
+
+| `hybrid`
+| evil with native Emacs insert-state bindings
+| Vim motions + Emacs muscle memory in insert
+|===
+
+Defaults: `jk` fast-escape (better-escape), `gcc`/`gc` commenting
+(evil-commentary), surround operators, `g C-a` number increment.
+
+"""
+
+== 5. Keybindings
+
+One shared leader map bound to `SPC` in every modal state. Layout mirrors
+AstroNvim/spacemacs conventions; everything is which-key-discoverable —
+press `SPC` and wait.
+
+image::keybindings.svg[Leader keymap tree]
+
+=== 5.1 Universal
+
+|===
+| key | command
+
+| `SPC SPC`
+| `execute-extended-command` (M-x)
+
+| `SPC u`
+| universal argument
+
+| `SPC !` / `SPC &`
+| shell command / async shell command
+|===
+
+=== 5.2 Buffers — `SPC b`
+
+|===
+| key | command
+
+| `SPC b b` / `SPC b B`
+| consult-buffer (this window / other window)
+
+| `SPC b d` / `SPC b D`
+| kill current buffer / kill buffer
+
+| `SPC b i`
+| ibuffer
+
+| `SPC b n` / `SPC b p` / `SPC b [` / `SPC b ]`
+| next / previous buffer
+
+| `SPC b R`
+| revert buffer
+
+| `SPC b s` / `SPC b S`
+| save buffer / save some
+
+| `SPC b u`
+| vundo — visual undo tree (undotree equivalent)
+|===
+
+=== 5.3 Files — `SPC f`
+
+|===
+| key | command
+
+| `SPC f f` / `SPC f F`
+| find file (this window / other window)
+
+| `SPC f r`
+| consult-recent-file
+
+| `SPC f s` / `SPC f S`
+| save / write file
+
+| `SPC f R`
+| rename file and buffer
+
+| `SPC f d`
+| dirvish (dired overhaul — yazi equivalent)
+
+| `SPC f t`
+| toggle treemacs file tree
+
+| `SPC f y`
+| copy file path to kill ring
+
+| `SPC f e`
+| open user config directory
+|===
+
+=== 5.4 Search — `SPC s`
+
+|===
+| key | command
+
+| `SPC s b` / `SPC s B`
+| consult-line (buffer / all buffers)
+
+| `SPC s g` / `SPC s /`
+| consult-ripgrep (project)
+
+| `SPC s f`
+| consult-find
+
+| `SPC s i` / `SPC s I`
+| imenu (buffer / all buffers)
+
+| `SPC s m`
+| consult-mark
+
+| `SPC s o`
+| consult-outline
+
+| `SPC s h`
+| consult-history
+|===
+
+=== 5.5 Jump — `SPC j` (flash.nvim equivalent)
+
+|===
+| key | command
+
+| `SPC j j`
+| avy-goto-char-timer
+
+| `SPC j l`
+| avy-goto-line
+
+| `SPC j w`
+| avy-goto-word-1
+|===
+
+=== 5.6 Code — `SPC c` and diagnostics — `SPC e` / `SPC x`
+
+|===
+| key | command
+
+| `SPC c a`
+| eglot code actions
+
+| `SPC c r`
+| eglot rename
+
+| `SPC c f`
+| apheleia format buffer (conform.nvim equivalent)
+
+| `SPC c i`
+| find implementation
+
+| `SPC e` / `SPC E`
+| flymake diagnostics (buffer / project)
+
+| `SPC x`
+| consult-flymake — quickfix-style list
+|===
+
+=== 5.7 Windows — `SPC w`
+
+|===
+| key | command
+
+| `SPC w v` / `SPC w s`
+| vsplit / split
+
+| `SPC w h/j/k/l`
+| move focus
+
+| `SPC w m`
+| maximize (delete other windows)
+
+| `SPC w =`
+| balance windows
+
+| `SPC w c`
+| close window
+|===
+
+=== 5.8 Toggles — `SPC t`
+
+|===
+| key | command
+
+| `SPC t l`
+| line numbers
+
+| `SPC t r`
+| read-only mode
+
+| `SPC t w`
+| whitespace mode
+
+| `SPC t v`
+| visual line mode
+
+| `SPC t m`
+| switch evil ⇄ meow
+|===
+
+=== 5.9 Notes & org — `SPC n`
+
+|===
+| key | command
+
+| `SPC n r` / `SPC n R`
+| org-roam node find / toggle roam buffer
+
+| `SPC n c`
+| citar — open bibliography
+
+| `SPC n a` / `SPC n t`
+| org agenda / todo list
+
+| `SPC n n`
+| org capture
+
+| `SPC n p`
+| start jupyter-python session
+
+| `SPC n x`
+| org export dispatcher
+|===
+
+=== 5.10 Workspaces — `SPC T` (grapple.nvim equivalent)
+
+`SPC T T` transient menu: add (`T a`), switch (`T s`), close, next, previous —
+backed by tab-bar with per-project naming.
+
+=== 5.11 Git — `SPC g` (+tools/git layer)
+
+|===
+| key | command
+
+| `SPC g g`
+| magit status
+
+| `SPC g s` / `SPC g c` / `SPC g p`
+| stage / commit / push
+
+| `SPC g l` / `SPC g d`
+| log / diff
+
+| `SPC g t`
+| git-timemachine
+|===
+
+=== 5.12 Language — `SPC m` (local leader, layer-provided)
+
+|===
+| layer | keys
+
+| +lang/emacs-lisp
+| `m e` macrostep-expand, `m b` eval-buffer, `m f` eval-defun, `m r` eval-region
+
+| +lang/python
+| `m v` pyvenv-activate, `m s` run-python, `m j` jupyter session
+|===
+
+=== 5.13 Help — `SPC h` (helpful-enhanced)
+
+`h f` function, `h v` variable, `h k` key, `h c` command, `h m` mode,
+`h h` manual, `h L` list all Astraea layers.
+
+=== 5.14 Transient menus
+
+`SPC T T` workspaces, plus git/buffer transient prefixes — all
+which-key-discoverable with live documentation.
+
+"""
+
+== 6. Modes
+
+[cols="1,2"]
+|===
+| category | detail
+
+| *modal states*
+| evil (normal/insert/visual/motion) _or_ meow (normal/motion/keypad) _or_ hybrid — switched live
+
+| *programming*
+| treesit major modes auto-remapped at font-lock level 4: python, rust, zig, js/ts, json, yaml, toml, markdown, bash, html, css
+
+| *org*
+| org-modern visuals, org-appear, valign tables, cdlatex in org buffers, jupyter babel with async sessions
+
+| *markdown / asciidoc*
+| markdown-mode + grip WebKit preview; adoc-mode for `.adoc`
+
+| *prose & mail*
+| visual-line, typographic punctuation, pandoc export via ox-pandoc
+
+| *shell*
+| eshell per project root (`M-x astraea/terminal`), UTF-8 pwsh on Windows
+
+| *LSP-managed buffers*
+| eglot/lsp-mode, eldoc-box signature float, flymake inline popons, apheleia on save
+|===
+
+"""
+
+== 7. Dashboard
+
+Spacemacs-style dashboard (alpha-nvim equivalent) with an **image banner**:
+
+* `astraea-dashboard-banner` — path to any PNG/JPG; defaults to
+  `etc/banner.png` in the framework. Swap it by pointing the variable at your
+  own image — no code edits needed.
+* Sections: recent files, projects, bookmarks, agenda — with icons.
+* Footer: playful status lines + sparkle icon.
+* Toggle everything with `astraea-dashboard-enabled nil`.
+
+"""
+
+== 8. Themes
+
+Beautiful, feminine, cute — **no doom themes, ever**:
+
+[cols="1,2"]
+|===
+| package | themes
+
+| ef-themes (GNU ELPA)
+| `ef-summer` (default — pastel pink), `ef-rosa`, `ef-cyprus`, `ef-elea`, `ef-trio`…
+
+| sakura-theme
+| `sakura` — soft cherry blossom
+
+| cherry-blossom-theme
+| `cherry-blossom`
+
+| pink-bliss-uwu-theme
+| `pink-bliss-uwu` — unapologetically pink
+
+| pastelmac-theme
+| `pastelmac`
+
+| bubbleberry-theme
+| `bubbleberry`
+
+| lavender-theme
+| `lavender`
+
+| moe-theme
+| `moe-light`, `moe-dark`
+
+| kaolin-themes
+| `kaolin-*` soft pastel set
+
+| catppuccin-theme
+| `catppuccin` — pastel mocha/frappé
+
+| kanagawa-themes
+| `kanagawa` — wave-art fallback
+|===
+
+Preview interactively with `M-x ef-themes-select` or `M-x load-theme TAB`.
+
+"""
+
+== 9. Configuration reference
+
+Everything below is a `defcustom` — set it in `~/.astraea.d/init.el` *before*
+`(astraea/init)`.
+
+[cols="2,1,3"]
+|===
+| variable | default | purpose
+
+| `astraea-modal-style`
+| `'evil`
+| `'evil`, `'meow`, or `'hybrid` — runtime-switchable
+
+| `astraea-modal-switchable`
+| `t`
+| install both engines so switching is possible
+
+| `astraea-theme`
+| `'ef-summer`
+| theme symbol passed to `load-theme`
+
+| `astraea-lsp-backend`
+| `'eglot`
+| `'eglot` (light) or `'lsp-mode` (feature-rich)
+
+| `astraea-completion-backend`
+| `'corfu`
+| `'corfu` or `'company`
+
+| `astraea-dashboard-enabled`
+| `t`
+| show dashboard at startup
+
+| `astraea-dashboard-banner`
+| `"etc/banner.png"`
+| image for the dashboard banner (relative → `user-emacs-directory`)
+
+| `astraea-leader-key`
+| `"SPC"`
+| leader key
+
+| `astraea-localleader-key`
+| `","`
+| local leader key
+
+| `astraea-user-directory`
+| `~/.astraea.d/`
+| user config + cached state
+
+| `astraea-startup-benchmark`
+| `nil`
+| print startup timing when ready
+
+| `astraea-copilot-enabled`
+| `nil`
+| GitHub Copilot in prog buffers (needs copilot-language-server)
+
+| `astraea-discord-presence-enabled`
+| `nil`
+| Discord rich presence via elcord
+
+| `astraea-wakatime-enabled`
+| `nil`
+| WakaTime tracking (needs `wakatime-cli`)
+|===
+
+=== 9.1 Example user config
+
+[source,elisp]
+----
+;; ~/.astraea.d/init.el
+(setq astraea-modal-style 'evil
+      astraea-lsp-backend 'eglot
+      astraea-completion-backend 'corfu
+      astraea-theme 'ef-summer
+      astraea-startup-benchmark t
+      astraea-copilot-enabled t)
+
+(astraea/enable-layer '+tools/git)
+(astraea/enable-layer '+lang/emacs-lisp)
+(astraea/enable-layer '+lang/python)
+
+(astraea-layer! +personal/writeroom
+  :packages (writeroom-mode)
+  :init (elpaca writeroom-mode)
+  :config (setq writeroom-width 100))
+
+(astraea/leader-def "f p"
+  #'(lambda () (interactive) (find-file "~/.astraea.d/init.el")))
+
+;;; keep this line LAST:
+(astraea/init)
+----
+
+"""
+
+== 10. Layers
+
+image::layers.svg[Layer system]
+
+A layer is a named bundle of packages + init/config hooks + keybinds, declared
+with `astraea-layer!` and enabled with `astraea/enable-layer`.
+
+=== 10.1 Authoring a file layer
+
+Create `layers/astraea-layer-+category-name.el`:
+
+[source,elisp]
+----
+(astraea-layer! +lang/rust
+  :packages (rustic)
+  :init  (elpaca rustic)                       ; queue installation
+  :config (setq rustic-format-on-save t)       ; run after activation
+  :keybinds (astraea/leader-def "m r" #'rustic-cargo-run))
+
+(provide 'astraea-layer-rust)
+----
+
+Enable it from user config: `(astraea/enable-layer '+lang/rust)`.
+
+[cols="1,2"]
+|===
+| hook | when it runs
+
+| `:init`
+| during `astraea/init`, before elpaca processes queues
+
+| `:config`
+| once packages are activated (warm start: synchronously; cold start: after the queue drains)
+
+| `:keybinds`
+| after `:config`, once the leader map exists
+|===
+
+Inspect the live registry with `SPC h L` (`M-x astraea/list-layers`).
+
+"""
+
+== 11. Feature stacks in detail
+
+=== 11.1 Completion (blink.cmp / coq_nvim equivalents)
+
+image::stacks.svg[Completion, IDE, org and tool stacks]
+
+[cols="1,2"]
+|===
+| stack | packages
+
+| minibuffer
+| vertico + orderless + marginalia + consult + embark + consult-dir
+
+| in-buffer
+| corfu + cape + nerd-icons-corfu (+ company as alternative backend)
+
+| snippets
+| yasnippet + yasnippet-snippets
+
+| terminal fallback
+| corfu-terminal (auto-enables in TTY)
+|===
+
+Corfu matches blink.cmp latency: `corfu-auto-delay 0.15`, 2-char trigger,
+preview off, cycling on.
+
+=== 11.2 IDE services
+
+[cols="1,2"]
+|===
+| concern | solution
+
+| LSP
+| eglot (default — zero config) or lsp-mode (`astraea-lsp-backend`)
+
+| formatting
+| apheleia — async, never blocks typing (conform.nvim equivalent)
+
+| debugging
+| dape (nvim-dap equivalent)
+
+| diagnostics
+| flymake + flymake-collection + flymake-popon inline popups
+
+| signatures
+| eldoc-box hover float (lsp_signature equivalent)
+
+| treesitter
+| built-in treesit, font-lock level 4, `M-x astraea/treesit-install-all`
+|===
+
+=== 11.3 Org & science (scimax)
+
+* **jupyter** — async org-babel python notebooks (`SPC n p`)
+* **citar + biblio + parsebib** — bibliography, notes, crossref/arxiv search
+* **cdlatex + auctex** — fast LaTeX inside org and standalone
+* **org-roam + citar-org-roam** — linked zettelkasten with bibliography
+* **org-download** — paste clipboard images into `./assets/`
+* **ox-pandoc, ox-hugo, htmlize** — export anything to anything
+
+=== 11.4 Tools
+
+dirvish (yazi), treemacs (neo-tree), magit (layer), avy (flash),
+tab-bar workspaces (grapple), consult-yank-pop (neoclip), org-download
+(img-clip), grip (markdown preview), projectile + project.el, vundo
+(undotree), treesit-fold (UFO), wgrep (grug-far).
+
+"""
+
+== 12. Full package inventory
+
+[cols="1,1"]
+|===
+| your Neovim plugin | Astraea equivalent
+
+| blink.cmp / coq_nvim
+| corfu + cape (+ vertico/consult minibuffer stack)
+
+| telescope
+| consult + vertico + embark
+
+| neo-tree
+| treemacs (+ dirvish)
+
+| conform.nvim
+| apheleia
+
+| mason / nvim-lspconfig
+| eglot (built-in) or lsp-mode
+
+| none-ls diagnostics
+| flymake + flymake-collection
+
+| nvim-dap + mason-dap
+| dape
+
+| noice / nvim-notify
+| transient menus + eldoc-box popups + flymake-popon
+
+| flash.nvim
+| avy
+
+| grapple.nvim
+| tab-bar workspaces + `SPC T` transient
+
+| yazi.nvim
+| dirvish
+
+| undotree
+| vundo + undo-fu-session (persistent)
+
+| grug-far.nvim
+| consult-ripgrep + wgrep
+
+| neoclip.nvim
+| consult-yank-pop + savehist
+
+| img-clip.nvim
+| org-download
+
+| markview / markdown-preview.nvim
+| markdown-mode + grip (WebKit live preview)
+
+| treesitter
+| built-in treesit (Emacs 30+), level-4 font-lock
+
+| nvim-ufo
+| treesit-fold
+
+| alpha-nvim
+| dashboard.el with image banner
+
+| bufferline.nvim
+| mood-line + tab-bar
+
+| better-escape.nvim
+| evil-escape (`jk`)
+
+| comment.nvim
+| evil-commentary
+
+| nvim-autopairs
+| electric-pair-mode (built-in)
+
+| copilot.lua
+| copilot (opt-in)
+
+| presence.nvim
+| elcord (opt-in)
+
+| wakatime.lua
+| wakatime-mode (opt-in)
+
+| asciidoc.nvim
+| adoc-mode
+
+| mini.nvim
+| covered by the dedicated modules above (vertico/corfu/mood-line cover mini.pick/mini.completion/mini.statusline roles)
+|===
+
+"""
+
+== 13. Troubleshooting
+
+[cols="1,2"]
+|===
+| symptom | fix
+
+| "Org version mismatch" warning
+| benign — newer Org is installed via elpaca; loads correctly after startup
+
+| `git.exe` access-violation dialogs during install
+| Astraea caps elpaca parallelism at 4 on Windows; also update Git for Windows
+
+| "Unable to find main elisp file" for package X
+| stale/partial clone of X — delete `elpaca/sources/X/` and restart
+
+| symlink errors on Windows
+| already handled: `elpaca-no-symlink-mode` is enabled on `windows-nt`
+
+| emacsclient refuses to connect
+| stale auth file is auto-deleted at startup; or `M-x server-force-delete` + `M-x server-start`
+
+| a package order shows "failed"
+| `M-x elpaca-manager`, mark for retry; or just restart — failures re-queue automatically
+|===
+
+"""
+
+== 14. FAQ
+
+* *Does it have a dashboard?* — Yes, spacemacs-style with an image banner
+  (`astraea-dashboard-banner`), icon sections and a friendly footer.
+* *Can I switch evil ⇄ meow without restarting?* — Yes:
+  `M-x astraea/set-modal-style` or `SPC t m`.
+* *Will an upgrade wipe my config?* — No. User config lives in
+  `~/.astraea.d/`; the framework directory is disposable/re-cloneable.
+* *Windows support?* — First-class: UTF-8 pwsh shell, no-symlink installs,
+  capped parallel git, junction-based auto-loading.
+* *License?* — GPL-3.0-or-later (Astraea configures GPL Emacs code).
+
+"""
+
+== 15. Design decisions
+
+1. **One leader map, two engines** — `astraea-leader-map` is a plain keymap
+   bound to `SPC` in evil's states and meow's normal state alike.
+2. **Layers are data, not includes** — a layer is a plist on a symbol;
+   enable order is independent of load order, and inline layers live in
+   user config.
+3. **elpaca over straight/package** — async parallel installs, native-comp
+   integration, transactional queues; `use-package` is transparently
+   redirected.
+4. **Everything defers** — core modules only declare packages; activation
+   is bound to first use, so startup cost is bounded regardless of feature
+   count.
+5. **Backends are defcustoms** — swap whole subsystems without touching
+   framework code.
+6. **Windows is a first-class platform** — pwsh+UTF-8 shell, copy-based
+   builds, capped concurrency, junction auto-load.
+
+"""
+
+== 16. Diagram sources
+
+The d2 sources for every diagram live in `docs/diagrams/*.d2` and render to
+`docs/images/*.svg`:
+
+[source,powershell]
+----
+& C:\Users\Ahri\Software\d2-v0.9.0\bin\d2.exe docs\diagrams\architecture.d2 docs\images\architecture.svg
+----
+
+Available diagrams: `architecture`, `layers`, `modal`, `stacks`, `keybindings`.
+
+"""
+
+== 17. License
+
+GPL-3.0-or-later — Astraea embeds and configures GPL Emacs code and must
+inherit the license.
