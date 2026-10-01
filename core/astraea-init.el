@@ -84,6 +84,10 @@
 (require 'astraea-org)
 (require 'astraea-project)
 (require 'astraea-integrations)
+(require 'astraea-toggles)
+(require 'astraea-transients)
+(require 'astraea-editing)
+(require 'astraea-scimax)
 
 ;; ── User configuration ────────────────────────────────────────────────────
 (defun astraea//seed-user-config ()

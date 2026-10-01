@@ -367,17 +367,59 @@ image::keybindings.svg[Leader keymap tree]
 | `SPC t l`
 | line numbers
 
+| `SPC t n`
+| line number style (relative/absolute/visual/off)
+
 | `SPC t r`
 | read-only mode
 
 | `SPC t w`
 | whitespace mode
 
+| `SPC t W`
+| whitespace cleanup (delete trailing whitespace, reindent)
+
 | `SPC t v`
 | visual line mode
 
+| `SPC t f`
+| fill-column indicator
+
+| `SPC t F`
+| auto-fill mode
+
+| `SPC t h`
+| highlight current line
+
+| `SPC t p`
+| show parentheses
+
+| `SPC t C`
+| rainbow delimiters
+
+| `SPC t o`
+| highlight TODO/FIXME keywords
+
+| `SPC t V`
+| volatile highlights
+
+| `SPC t g`
+| golden-ratio window sizing
+
+| `SPC t -`
+| centered cursor
+
+| `SPC t s`
+| flyspell (on-the-fly spell checking)
+
+| `SPC t D`
+| debug-on-error
+
 | `SPC t m`
 | switch evil ⇄ meow
+
+| `SPC t .`
+| toggle transient state (stays open)
 |===
 
 === 5.9 Notes & org — `SPC n`
@@ -402,6 +444,15 @@ image::keybindings.svg[Leader keymap tree]
 
 | `SPC n x`
 | org export dispatcher
+
+| `SPC n j`
+| org-journal — new journal entry (scimax-journal)
+
+| `SPC n P`
+| org-present — presentation mode (org-show equivalent)
+
+| `SPC n w`
+| research menu for word at point
 |===
 
 === 5.10 Workspaces — `SPC T` (grapple.nvim equivalent)
@@ -444,7 +495,69 @@ backed by tab-bar with per-project naming.
 `h f` function, `h v` variable, `h k` key, `h c` command, `h m` mode,
 `h h` manual, `h L` list all Astraea layers.
 
-=== 5.14 Transient menus
+=== 5.14 Quit & restart — `SPC q`
+
+|===
+| key | command
+
+| `SPC q q`
+| save all and prompt to quit
+
+| `SPC q Q` / `SPC q s`
+| kill without saving / save all and kill
+
+| `SPC q f`
+| delete frame ("frame killer")
+
+| `SPC q r`
+| restart Emacs (restart-emacs) — restores session
+|===
+
+=== 5.15 Text utilities — `SPC x`
+
+|===
+| key | command
+
+| `SPC x a`
+| align-regexp (align columns)
+
+| `SPC x d`
+| duplicate line or region
+
+| `SPC x l`
+| sort lines
+
+| `SPC x u`
+| deduplicate lines
+
+| `SPC x c`
+| count words
+
+| `SPC x e`
+| expand-region (`C-=` also bound)
+
+| `SPC x i`
+| iedit — edit all occurrences at once
+
+| `SPC x m e` / `SPC x m n` / `SPC x m a`
+| multiple-cursors: edit lines / mark next / mark all
+
+| `SPC x r`
+| rotate windows
+|===
+
+=== 5.16 Transient states (spacemacs signature feature)
+
+Persistent single-key popups:
+
+* `SPC w .` — window state: hjkl move, HJKL resize, splits, maximize,
+  winner undo/redo, ace-window
+* `SPC z x` — font scale: `+`/`-`/`0`
+* `SPC t .` — quick toggles, stays open
+* `SPC n w` — research menu: Google/Scholar/arXiv/PubMed/dictionary/thesaurus
+  on the word at point (scimax words.el port)
+
+=== 5.17 Transient menus
 
 `SPC T T` workspaces, plus git/buffer transient prefixes — all
 which-key-discoverable with live documentation.

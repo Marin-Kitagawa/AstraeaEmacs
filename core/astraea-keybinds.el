@@ -107,21 +107,65 @@ message instead of aborting bootstrap."
    "T T" #'astraea/transient-workspace
    "T a" #'astraea/workspace-add
    "T s" #'astraea/workspace-switch
+   "T m" #'menu-bar-mode
+   "T t" #'tool-bar-mode
+   "T F" #'astraea/cycle-fullscreen
    ;; toggles (spacemacs-style SPC t prefix)
    "t l" #'display-line-numbers-mode
    "t r" #'read-only-mode
    "t w" #'whitespace-mode
    "t v" #'visual-line-mode
    "t m" #'astraea/toggle-modal-style
+   "t f" #'display-fill-column-indicator-mode
+   "t h" #'hl-line-mode
+   "t p" #'show-paren-mode
+   "t C" #'rainbow-delimiters-mode
+   "t o" #'hl-todo-mode
+   "t s" #'flyspell-mode
+   "t D" #'astraea/toggle-debug-on-error
+   "t W" #'astraea/whitespace-cleanup
+   "t g" #'golden-ratio-mode
+   "t -" #'centered-cursor-mode
+   "t V" #'volatile-highlights-mode
+   "t n" #'astraea/toggle-line-numbers-style
+   "t F" #'auto-fill-mode
+   "t ." #'astraea/toggle-transient
    "t f" #'astraea/cycle-fullscreen
-   ;; help (helpful-enhanced)
+;; help (helpful-enhanced)
    "h f" #'helpful-function
    "h v" #'helpful-variable
    "h k" #'helpful-key
    "h c" #'helpful-command
    "h m" #'describe-mode
    "h h" #'(lambda () (interactive) (info-emacs-manual))
-   "h L" #'(lambda () (interactive) (astraea/list-layers))))
+   "h L" #'(lambda () (interactive) (astraea/list-layers))
+   ;; quit / restart (spacemacs SPC q)
+   "q q" #'save-buffers-kill-terminal
+   "q Q" #'kill-emacs
+   "q s" #'save-buffers-kill-emacs
+   "q f" #'delete-frame
+   "q r" #'restart-emacs
+   ;; text utilities (spacemacs SPC x)
+   "x a" #'align-regexp
+   "x d" #'astraea/duplicate-line-or-region
+   "x l" #'sort-lines
+   "x u" #'astraea/deduplicate-lines
+   "x c" #'count-words
+   "x e" #'er/expand-region
+   "x i" #'iedit-mode
+   "x m e" #'mc/edit-lines
+   "x m n" #'mc/mark-next-like-this
+   "x m a" #'mc/mark-all-like-this
+   "x r" #'astraea/rotate-windows
+   ;; windows extras
+   "w u" #'winner-undo
+   "w U" #'winner-redo
+   "w a" #'ace-window
+   "w r" #'astraea/rotate-windows
+   ;; notes & research extras
+   "n j" #'org-journal-new-entry
+   "n P" #'org-present
+   "n w" #'astraea/research-menu))
 
 ;; ── Transient menus (spacemacs-style popups with discoverability) ────────
 (transient-define-prefix astraea/transient-git ()
