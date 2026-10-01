@@ -9,18 +9,20 @@
 ;;   roam-style zettelkasten      → org-roam (optional, heavy: defers)
 
 ;; ── Org base ─────────────────────────────────────────────────────────────
-(elpaca org
-  (let ((agenda-dir (expand-file-name "org/agenda/" astraea-user-directory)))
-    (make-directory agenda-dir t)      ; must exist: org-agenda prompts on missing dirs
-    (setq org-ellipsis " ▾"
+;; Emacs 30+ ships a recent built-in Org — installing a second Org via a
+;; package manager triggers repeating "Org version mismatch" warnings.
+;; We therefore do NOT queue `org' as an elpaca order; just configure it.
+(make-directory (expand-file-name "org/agenda/" astraea-user-directory) t)
+(with-eval-after-load 'org
+  (setq org-ellipsis " ▾"
         org-hide-emphasis-markers t        ; with org-appear, they come back on cursor
         org-src-fontify-natively t
         org-src-tab-acts-natively t
         org-edit-src-content-indentation 0
         org-confirm-babel-evaluate nil     ; trust your own notebooks
-        org-agenda-files (list agenda-dir)
+        org-agenda-files (list (expand-file-name "org/agenda/" astraea-user-directory))
         org-latex-compiler "xelatex"
-        org-preview-latex-default-process 'dvisvgm)))
+        org-preview-latex-default-process 'dvisvgm))
 
 ;; ── Modern looks ────────────────────────────────────────────────────────
 (elpaca org-modern
