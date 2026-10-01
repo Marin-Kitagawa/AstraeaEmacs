@@ -63,12 +63,12 @@ those; nil disables auto-enable."
     (crystal    :pkgs (crystal-mode)              :lsp ("crystalline"))
     (groovy     :pkgs (groovy-mode))
     (solidity   :pkgs (solidity-mode))
-    (purescript :pkgs (psc-ide-mode))
+    (purescript :pkgs (psc-ide))
     (racket     :pkgs (racket-mode))
     (scheme     :pkgs (geiser))
     (common-lisp :pkgs (slime))
     (coq        :pkgs (proof-general))
-    (agda       :pkgs (agda2-mode))
+    (agda       :pkgs ())  ; agda2-mode ships with the Agda compiler
     (idris      :pkgs (idris-mode))
     (julia      :pkgs (julia-mode)                :lsp ("julia" "--startup-file=no" "-e" "using LanguageServer; runserver()"))
     (ess        :pkgs (ess))
@@ -80,7 +80,7 @@ those; nil disables auto-enable."
     (sql        :pkgs ()                          :lsp ("sqls"))
     (autohotkey :pkgs (ahk-mode))
     (vimscript  :pkgs (vimrc-mode))
-    (windows-scripts :pkgs (powershell-mode)      :lsp ("PowerShellEditorServices" "-Stdio"))
+    (windows-scripts :pkgs (powershell)      :lsp ("PowerShellEditorServices" "-Stdio"))
     (asciidoc   :pkgs (adoc-mode))
     (bibtex     :pkgs ())
     (csv        :pkgs (csv-mode))
@@ -92,20 +92,20 @@ those; nil disables auto-enable."
     (faust      :pkgs (faust-mode))
     (forth      :pkgs (forth-mode))
     (fountain   :pkgs (fountain-mode))
-    (factor     :pkgs (factor-mode))
+    (factor     :pkgs ())  ; factor-mode ships with the Factor distribution
     (extempore  :pkgs (extempore-mode))
-    (jr         :pkgs (jr-mode))
+    (jr         :pkgs (j-mode))   ; J language
     (hy         :pkgs (hy-mode))
-    (mercury    :pkgs (mercury-mode))
-    (pact       :pkgs (pact-mode))
+    (mercury    :pkgs ())  ; mercury-mode ships with the Mercury compiler
+    (pact       :pkgs ())  ; pact-mode ships with the Pact distribution
     (prolog     :pkgs (ediprolog))
     (raku       :pkgs (raku-mode))
     (reasonml   :pkgs (reason-mode))
     (restructuredtext :pkgs (sphinx-mode))
     (semantic-web :pkgs (ttl-mode))
-    (sml        :pkgs (sml-mode))
+    (sml        :pkgs (sml-mode))  ; GNU ELPA
     (yang       :pkgs (yang-mode))
-    (gleam      :pkgs (gleam-mode))
+    (gleam      :pkgs (gleam-ts-mode))
     (major-modes :pkgs ()))
   "Registry mapping languages to packages, treesit grammar, LSP server
 and formatter.  Derived from spacemacs +lang/* layers (all 84).")
