@@ -178,17 +178,59 @@ Installed in `org-ctrl-c-ctrl-c-final-hook'; return t when handled."
     (define-key flyspell-mode-map (kbd "C-;") #'flyspell-correct-wrapper)))
 
 ;; ── research menu (scimax words.el lightweight port) ────────────────
+(defun astraea/research-word ()
+  "Word at point, or prompt."
+  (or (thing-at-point 'word t) (read-string "Word: ")))
+
+(defun astraea/define-word-inline ()
+  "Look up the word at point with dictionaryapi.dev and show
+pronunciations + definitions in a help buffer (no API key needed)."
+  (interactive)
+  (let* ((word (astraea/research-word))
+         (url (format "https://api.dictionaryapi.dev/api/v2/entries/en/%s" word))
+         (buf (url-retrieve-synchronously url nil nil 10)))
+    (if (not buf)
+        (user-error "Could not reach dictionaryapi.dev")
+      (with-current-buffer buf
+        (goto-char (point-min))
+        (when (re-search-forward "No Definitions Found" nil t)
+          (kill-buffer)
+          (user-error "No definitions for %s" word))
+        (goto-char (point-min))
+        (re-search-forward "^\\[")
+        (let* ((json (json-parse-buffer :array-type list :object-type alist))
+               (entry (aref (vconcat json) 0))
+               (phon (cdr (assoc "phonetic" entry)))
+               (meanings (cdr (assoc "meanings" entry))))
+          (with-current-buffer (get-buffer-create "*Define Word*")
+            (erase-buffer)
+            (insert (format "✦ %s%s\n\n" word (if phon (format "  /%s/" phon) "")))
+            (dolist (m meanings)
+              (insert (format "■ %s\n" (cdr (assoc "partOfSpeech" m))))
+              (let ((i 1))
+                (dolist (d (cdr (assoc "definitions" m)))
+                  (insert (format "  %d. %s\n" i (cdr (assoc "definition" d))))
+                  (when-let ((ex (cdr (assoc "example" d))))
+                    (insert (format "     example: %s\n" ex)))
+                  (setq i (1+ i)))
+                (insert "\n")))
+            (goto-char (point-min))
+            (special-mode)
+            (pop-to-buffer (current-buffer))))
+        (kill-buffer buf)))))
+
 (defun astraea/research (engine)
   "Look up the word at point (or read one) with ENGINE's URL template."
-  (let* ((word (or (thing-at-point 'word t)
-                   (read-string "Word: ")))
+  (let* ((word (astraea/research-word))
          (url (pcase engine
                 ('google  (format "https://google.com/search?q=%s" word))
                 ('scholar (format "https://scholar.google.com/scholar?q=%s" word))
                 ('arxiv   (format "https://arxiv.org/abs/%s" word))
                 ('pubmed  (format "https://pubmed.ncbi.nlm.nih.gov/?term=%s" word))
                 ('dict    (format "https://www.merriam-webster.com/dictionary/%s" word))
-                ('thes    (format "https://www.thesaurus.com/browse/%s" word)))))
+                ('thes    (format "https://www.thesaurus.com/browse/%s" word))
+                ('wiktionary (format "https://en.wiktionary.org/wiki/%s" word))
+                ('urban   (format "https://www.urbandictionary.com/define.php?term=%s" word)))))
     (browse-url url)))
 
 (transient-define-prefix astraea/research-menu ()
@@ -199,7 +241,10 @@ Installed in `org-ctrl-c-ctrl-c-final-hook'; return t when handled."
     ("a" "arXiv"     (lambda () (interactive) (astraea/research 'arxiv)) :transient nil)
     ("p" "PubMed"    (lambda () (interactive) (astraea/research 'pubmed)) :transient nil)]
    [("d" "Dictionary" (lambda () (interactive) (astraea/research 'dict)) :transient nil)
-    ("t" "Thesaurus"  (lambda () (interactive) (astraea/research 'thes)) :transient nil)]])
+    ("t" "Thesaurus"  (lambda () (interactive) (astraea/research 'thes)) :transient nil)
+    ("w" "Wiktionary" (lambda () (interactive) (astraea/research 'wiktionary)) :transient nil)
+    ("u" "Urban"      (lambda () (interactive) (astraea/research 'urban)) :transient nil)]
+   [("D" "Definitions (inline)" astraea/define-word-inline :transient nil)]])
 
 (provide 'astraea-scimax)
 ;;; astraea-scimax.el ends here

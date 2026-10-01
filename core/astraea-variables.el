@@ -65,6 +65,10 @@ more features)."
 `company'."
   :type '(radio (const corfu) (const company)))
 
+(defcustom astraea-fun-enabled t
+  "Enable the emoji & fun layer (emojify, built-in games, xkcd)."
+  :type 'boolean)
+
 (defcustom astraea-wakatime-enabled nil
   "Enable WakaTime tracking (requires the `wakatime-cli' binary)."
   :type 'boolean)

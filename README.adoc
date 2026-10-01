@@ -452,7 +452,31 @@ image::keybindings.svg[Leader keymap tree]
 | org-present — presentation mode (org-show equivalent)
 
 | `SPC n w`
-| research menu for word at point
+| research menu for word at point (Scholar/arXiv/PubMed/dictionary/thesaurus/Wiktionary/Urban)
+
+| `SPC n D`
+| inline dictionary definitions (dictionaryapi.dev — no key needed)
+
+| `SPC n j`
+| org-journal — date-structured journaling
+
+| `SPC n P`
+| org-present — presentations (org-show equivalent, PgDn/PgUp navigate)
+
+| `SPC n m b` / `n m o`
+| ox-manuscript: export + LaTeX build (MiKTeX) / build and open PDF
+
+| `SPC n m n` / `n m w`
+| new manuscript from journal-class template (ACS, APS, Springer, Elsevier…) / texcount
+
+| `SPC i e` / `i s` / `i r`
+| emoji picker: insert / search / recent (built-in)
+
+| `SPC x g`
+| games arcade: Tetris, Snake, Pong, Gomoku, Life, Solitaire, Dunnet, Zone
+
+| `SPC x k`
+| xkcd browser
 |===
 
 === 5.10 Workspaces — `SPC T` (grapple.nvim equivalent)
@@ -1028,7 +1052,24 @@ Available diagrams: `architecture`, `layers`, `modal`, `stacks`, `keybindings`.
 
 """
 
-== 17. License
+== 18. Persistent workspaces, presentations & manuscripts
+
+* **Persistent workspaces** — tab-bar workspaces keep their window layouts per
+  tab; `desktop-save-mode` persists buffers and tabs across restarts.
+  `M-x astraea/workspace-save` saves now, `M-x astraea/workspace-reset` starts fresh.
+* **Presentations** — `SPC n P`: slides are org headings; PgDn/PgUp navigate,
+  `q` stops, `f` toggles big text, `i` toggles inline images; per-slide
+  narrowing and LaTeX fragment preview.
+* **Manuscripts** — vendored `ox-manuscript` with 30 journal-class templates
+  (ACS, APS, Springer, Elsevier…). MiKTeX pipeline: `pdflatex`/`bibtex`,
+  texcount word counts, template-based new manuscripts.
+* **Word research** — `SPC n w` transient + `SPC n D` inline definitions
+  (dictionaryapi.dev, no API key).
+* **Emoji & fun** — emojify everywhere, built-in emoji pickers, arcade
+  (Tetris/Snake/Pong/Gomoku/Life/Dunnet/Zone), xkcd. Opt out with
+  `astraea-fun-enabled nil`.
+
+== 19. License
 
 GPL-3.0-or-later — Astraea embeds and configures GPL Emacs code and must
 inherit the license.

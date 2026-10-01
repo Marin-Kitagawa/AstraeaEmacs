@@ -88,6 +88,10 @@
 (require 'astraea-transients)
 (require 'astraea-editing)
 (require 'astraea-scimax)
+(require 'astraea-workspaces)
+(require 'astraea-present)
+(require 'astraea-manuscript)
+(require 'astraea-fun)
 
 ;; ── User configuration ────────────────────────────────────────────────────
 (defun astraea//seed-user-config ()
