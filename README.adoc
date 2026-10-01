@@ -28,7 +28,7 @@ installed, share one keymap, and can be swapped with a single command.
 
 """
 
-== 1. Install
+== Install
 
 [cols="1,2"]
 |===
@@ -50,7 +50,7 @@ installed, share one keymap, and can be swapped with a single command.
 | for `SPC s g` project search
 |===
 
-=== 1.1 Standard install
+=== Standard install
 
 [source,powershell]
 ----
@@ -63,7 +63,7 @@ package manager with native-comp integration). Your configuration is seeded to
 `~/.astraea.d/init.el` — the framework directory stays pristine, so framework
 upgrades never clobber your personal setup.
 
-=== 1.2 Windows: make `runemacs.exe` pick up Astraea automatically
+=== Windows: make `runemacs.exe` pick up Astraea automatically
 
 Create an NTFS *directory junction* (no admin or Developer Mode required):
 
@@ -77,14 +77,14 @@ New-Item -ItemType Junction -Path C:\Users\Ahri\.emacs.d `
 After this, plain `runemacs.exe` loads Astraea natively. A real symlink also
 works if you have Developer Mode enabled.
 
-=== 1.3 Updating
+=== Updating
 
 Run `M-x elpaca-update-all`, or restart — failed orders are retried
 automatically. Inspect anything with `M-x elpaca-manager`.
 
 """
 
-== 2. Performance philosophy
+== Performance philosophy
 
 Astraea treats startup time and idle memory as first-class features:
 
@@ -100,7 +100,7 @@ Astraea treats startup time and idle memory as first-class features:
 
 """
 
-== 3. Architecture
+== Architecture
 
 The startup pipeline is linear and fully traceable; every stage is a single
 inspectable function.
@@ -111,7 +111,7 @@ Warm starts (everything already built) run `astraea//finish-init`
 synchronously inside `astraea/init`; cold first installs defer it to elpaca's
 post-queue hooks and an idle-timer fallback.
 
-=== 3.1 Module map
+=== Module map
 
 [cols="1,2"]
 |===
@@ -159,7 +159,7 @@ post-queue hooks and an idle-timer fallback.
 
 """
 
-== 4. Modal editing (zetta-style switching)
+== Modal editing (zetta-style switching)
 
 Both engines are installed together; your muscle memory never breaks because
 **the same `SPC` leader map works under both**.
@@ -192,7 +192,7 @@ Defaults: `jk` fast-escape (better-escape), `gcc`/`gc` commenting
 
 """
 
-== 5. Keybindings
+== Keybindings
 
 One shared leader map bound to `SPC` in every modal state. Layout mirrors
 AstroNvim/spacemacs conventions; everything is which-key-discoverable —
@@ -200,7 +200,7 @@ press `SPC` and wait.
 
 image::keybindings.svg[Leader keymap tree]
 
-=== 5.1 Universal
+=== Universal
 
 |===
 | key | command
@@ -215,7 +215,7 @@ image::keybindings.svg[Leader keymap tree]
 | shell command / async shell command
 |===
 
-=== 5.2 Buffers — `SPC b`
+=== Buffers — `SPC b`
 
 |===
 | key | command
@@ -242,7 +242,7 @@ image::keybindings.svg[Leader keymap tree]
 | vundo — visual undo tree (undotree equivalent)
 |===
 
-=== 5.3 Files — `SPC f`
+=== Files — `SPC f`
 
 |===
 | key | command
@@ -272,7 +272,7 @@ image::keybindings.svg[Leader keymap tree]
 | open user config directory
 |===
 
-=== 5.4 Search — `SPC s`
+=== Search — `SPC s`
 
 |===
 | key | command
@@ -299,7 +299,7 @@ image::keybindings.svg[Leader keymap tree]
 | consult-history
 |===
 
-=== 5.5 Jump — `SPC j` (flash.nvim equivalent)
+=== Jump — `SPC j` (flash.nvim equivalent)
 
 |===
 | key | command
@@ -314,7 +314,7 @@ image::keybindings.svg[Leader keymap tree]
 | avy-goto-word-1
 |===
 
-=== 5.6 Code — `SPC c` and diagnostics — `SPC e` / `SPC x`
+=== Code — `SPC c` and diagnostics — `SPC e` / `SPC x`
 
 |===
 | key | command
@@ -338,7 +338,7 @@ image::keybindings.svg[Leader keymap tree]
 | consult-flymake — quickfix-style list
 |===
 
-=== 5.7 Windows — `SPC w`
+=== Windows — `SPC w`
 
 |===
 | key | command
@@ -359,7 +359,7 @@ image::keybindings.svg[Leader keymap tree]
 | close window
 |===
 
-=== 5.8 Toggles — `SPC t`
+=== Toggles — `SPC t`
 
 |===
 | key | command
@@ -422,7 +422,7 @@ image::keybindings.svg[Leader keymap tree]
 | toggle transient state (stays open)
 |===
 
-=== 5.9 Notes & org — `SPC n`
+=== Notes & org — `SPC n`
 
 |===
 | key | command
@@ -479,12 +479,12 @@ image::keybindings.svg[Leader keymap tree]
 | xkcd browser
 |===
 
-=== 5.10 Workspaces — `SPC T` (grapple.nvim equivalent)
+=== Workspaces — `SPC T` (grapple.nvim equivalent)
 
 `SPC T T` transient menu: add (`T a`), switch (`T s`), close, next, previous —
 backed by tab-bar with per-project naming.
 
-=== 5.11 Git — `SPC g` (+tools/git layer)
+=== Git — `SPC g` (+tools/git layer)
 
 |===
 | key | command
@@ -502,7 +502,7 @@ backed by tab-bar with per-project naming.
 | git-timemachine
 |===
 
-=== 5.12 Language — `SPC m` (local leader, layer-provided)
+=== Language — `SPC m` (local leader, layer-provided)
 
 |===
 | layer | keys
@@ -514,12 +514,12 @@ backed by tab-bar with per-project naming.
 | `m v` pyvenv-activate, `m s` run-python, `m j` jupyter session
 |===
 
-=== 5.13 Help — `SPC h` (helpful-enhanced)
+=== Help — `SPC h` (helpful-enhanced)
 
 `h f` function, `h v` variable, `h k` key, `h c` command, `h m` mode,
 `h h` manual, `h L` list all Astraea layers.
 
-=== 5.14 Quit & restart — `SPC q`
+=== Quit & restart — `SPC q`
 
 |===
 | key | command
@@ -537,7 +537,7 @@ backed by tab-bar with per-project naming.
 | restart Emacs (restart-emacs) — restores session
 |===
 
-=== 5.15 Text utilities — `SPC x`
+=== Text utilities — `SPC x`
 
 |===
 | key | command
@@ -570,7 +570,7 @@ backed by tab-bar with per-project naming.
 | rotate windows
 |===
 
-=== 5.16 Transient states (spacemacs signature feature)
+=== Transient states (spacemacs signature feature)
 
 Persistent single-key popups:
 
@@ -581,14 +581,14 @@ Persistent single-key popups:
 * `SPC n w` — research menu: Google/Scholar/arXiv/PubMed/dictionary/thesaurus
   on the word at point (scimax words.el port)
 
-=== 5.17 Transient menus
+=== Transient menus
 
 `SPC T T` workspaces, plus git/buffer transient prefixes — all
 which-key-discoverable with live documentation.
 
 """
 
-== 6. Modes
+== Modes
 
 [cols="1,2"]
 |===
@@ -618,7 +618,7 @@ which-key-discoverable with live documentation.
 
 """
 
-== 7. Dashboard
+== Dashboard
 
 Spacemacs-style dashboard (alpha-nvim equivalent) with an **image banner**:
 
@@ -631,7 +631,7 @@ Spacemacs-style dashboard (alpha-nvim equivalent) with an **image banner**:
 
 """
 
-== 8. Themes
+== Themes
 
 Beautiful, feminine, cute — **no doom themes, ever**:
 
@@ -677,7 +677,7 @@ Preview interactively with `M-x ef-themes-select` or `M-x load-theme TAB`.
 
 """
 
-== 9. Configuration reference
+== Configuration reference
 
 Everything below is a `defcustom` — set it in `~/.astraea.d/init.el` *before*
 `(astraea/init)`.
@@ -743,7 +743,7 @@ Everything below is a `defcustom` — set it in `~/.astraea.d/init.el` *before*
 | WakaTime tracking (needs `wakatime-cli`)
 |===
 
-=== 9.1 Example user config
+=== Example user config
 
 [source,elisp]
 ----
@@ -773,14 +773,14 @@ Everything below is a `defcustom` — set it in `~/.astraea.d/init.el` *before*
 
 """
 
-== 10. Layers
+== Layers
 
 image::layers.svg[Layer system]
 
 A layer is a named bundle of packages + init/config hooks + keybinds, declared
 with `astraea-layer!` and enabled with `astraea/enable-layer`.
 
-=== 10.1 Authoring a file layer
+=== Authoring a file layer
 
 Create `layers/astraea-layer-+category-name.el`:
 
@@ -815,9 +815,9 @@ Inspect the live registry with `SPC h L` (`M-x astraea/list-layers`).
 
 """
 
-== 11. Feature stacks in detail
+== Feature stacks in detail
 
-=== 11.1 Completion (blink.cmp / coq_nvim equivalents)
+=== Completion (blink.cmp / coq_nvim equivalents)
 
 image::stacks.svg[Completion, IDE, org and tool stacks]
 
@@ -841,7 +841,7 @@ image::stacks.svg[Completion, IDE, org and tool stacks]
 Corfu matches blink.cmp latency: `corfu-auto-delay 0.15`, 2-char trigger,
 preview off, cycling on.
 
-=== 11.2 IDE services
+=== IDE services
 
 [cols="1,2"]
 |===
@@ -866,7 +866,7 @@ preview off, cycling on.
 | built-in treesit, font-lock level 4, `M-x astraea/treesit-install-all`
 |===
 
-=== 11.3 Org & science (scimax)
+=== Org & science (scimax)
 
 * **jupyter** — async org-babel python notebooks (`SPC n p`)
 * **citar + biblio + parsebib** — bibliography, notes, crossref/arxiv search
@@ -875,7 +875,7 @@ preview off, cycling on.
 * **org-download** — paste clipboard images into `./assets/`
 * **ox-pandoc, ox-hugo, htmlize** — export anything to anything
 
-=== 11.4 Tools
+=== Tools
 
 dirvish (yazi), treemacs (neo-tree), magit (layer), avy (flash),
 tab-bar workspaces (grapple), consult-yank-pop (neoclip), org-download
@@ -884,7 +884,7 @@ tab-bar workspaces (grapple), consult-yank-pop (neoclip), org-download
 
 """
 
-== 12. Full package inventory
+== Full package inventory
 
 [cols="1,1"]
 |===
@@ -977,7 +977,7 @@ tab-bar workspaces (grapple), consult-yank-pop (neoclip), org-download
 
 """
 
-== 13. Troubleshooting
+== Troubleshooting
 
 [cols="1,2"]
 |===
@@ -1004,7 +1004,7 @@ tab-bar workspaces (grapple), consult-yank-pop (neoclip), org-download
 
 """
 
-== 14. FAQ
+== FAQ
 
 * *Does it have a dashboard?* — Yes, spacemacs-style with an image banner
   (`astraea-dashboard-banner`), icon sections and a friendly footer.
@@ -1018,7 +1018,7 @@ tab-bar workspaces (grapple), consult-yank-pop (neoclip), org-download
 
 """
 
-== 15. Design decisions
+== Design decisions
 
 1. **One leader map, two engines** — `astraea-leader-map` is a plain keymap
    bound to `SPC` in evil's states and meow's normal state alike.
@@ -1038,7 +1038,7 @@ tab-bar workspaces (grapple), consult-yank-pop (neoclip), org-download
 
 """
 
-== 16. Diagram sources
+== Diagram sources
 
 The d2 sources for every diagram live in `docs/diagrams/*.d2` and render to
 `docs/images/*.svg`:
@@ -1052,7 +1052,7 @@ Available diagrams: `architecture`, `layers`, `modal`, `stacks`, `keybindings`.
 
 """
 
-== 18. Persistent workspaces, presentations & manuscripts
+== Persistent workspaces, presentations & manuscripts
 
 * **Persistent workspaces** — tab-bar workspaces keep their window layouts per
   tab; `desktop-save-mode` persists buffers and tabs across restarts.
@@ -1069,7 +1069,7 @@ Available diagrams: `architecture`, `layers`, `modal`, `stacks`, `keybindings`.
   (Tetris/Snake/Pong/Gomoku/Life/Dunnet/Zone), xkcd. Opt out with
   `astraea-fun-enabled nil`.
 
-== 19. License
+== License
 
 GPL-3.0-or-later — Astraea embeds and configures GPL Emacs code and must
 inherit the license.
