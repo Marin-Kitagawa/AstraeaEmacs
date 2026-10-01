@@ -60,7 +60,12 @@
 
 ;; Server: emacsclient support (skip in batch/non-GUI sessions)
 (require 'server)
-(unless (or noninteractive (server-running-p)) (server-start))
+(unless noninteractive
+  (ignore-errors
+    ;; clear stale auth/socket left by killed sessions, then start fresh
+    (unless (and (server-running-p) (server-process))
+      (server-force-delete)
+      (server-start))))
 
 (provide 'astraea-defaults)
 ;;; astraea-defaults.el ends here

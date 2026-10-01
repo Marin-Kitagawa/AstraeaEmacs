@@ -5,5 +5,22 @@ out.txt
 err.txt
 *~
 
+# emacs runtime junk (repo doubles as ~/.emacs.d via junction)
+/server/
+/transient/
+/eln-cache/
+/.cache/
+/snippets/
+/etc/
+/var/
+/backups/
+/auto-save/
+url/
+netrc
+tramp
+.Org
+org-persist/
+.dao
+
 /server
 /server/
