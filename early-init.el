@@ -53,7 +53,7 @@
         (background-color . "#1a1b26")
         (foreground-color . "#c0caf5")
         (alpha . 97)
-        (fullscreen . maximized)))  ; start maximized — delete this line for normal windows
+        (fullscreen . fullboth)))  ; true fullscreen (no titlebar/taskbar) — use 'maximized for window-maximized
 
 ;; interactive toggle anytime: M-x toggle-frame-maximized
 
