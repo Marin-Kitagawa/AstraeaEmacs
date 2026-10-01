@@ -14,7 +14,8 @@
 
 ;; ── session persistence (desktop) ────────────────────────────────────
 (when (fboundp 'desktop-save-mode)
-  (setq desktop-restore-frames t
+  (setq desktop-save 'always              ; never prompt, always save
+        desktop-restore-frames t
         desktop-restore-in-current-display t
         desktop-load-locked-desktop nil
         desktop-auto-save-timeout 30)
