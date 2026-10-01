@@ -17,4 +17,7 @@
 
 (require 'astraea-init)
 
+;; Load user configuration; it must call (astraea/init) at its end.
+(astraea/load-user-config)
+
 ;;; init.el ends here

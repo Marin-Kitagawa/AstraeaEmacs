@@ -51,7 +51,7 @@
           ("d" "~/Downloads/" "Downloads"))))
 
 ;; ── Clipboard history (neoclip.nvim equivalent) ────────────────────────
-(elpaca consult-yank)
+;; consult provides `consult-yank-pop' — no separate package needed
 (savehist-mode 1)                     ; persists kill-ring across sessions
 
 ;; ── Image paste (img-clip.nvim equivalent) ─────────────────────────────
@@ -68,7 +68,7 @@
 ;; ── Markdown (markview + markdown-preview.nvim equivalents) ────────────
 (elpaca markdown-mode
   (setq markdown-command "pandoc"))
-(elpaca grip
+(elpaca grip-mode
   (setq grip-preview-use-webkit t))    ; live GitHub-style preview
 
 ;; ── Eshell: integrated terminal (snacks terminal equivalent) ───────────

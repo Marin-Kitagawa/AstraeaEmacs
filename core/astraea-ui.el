@@ -56,7 +56,7 @@
 ;; ── Theme & syntax polish ────────────────────────────────────────────────
 (elpaca doom-themes)
 (elpaca catppuccin-theme)   ; matches your nvim catppuccin installs
-(elpaca kanagawa-theme)     ; matches your nvim kanagawa
+(elpaca kanagawa-themes)     ; matches your nvim kanagawa (theme: kanagawa)
 (elpaca indent-bars)
 (elpaca treesit-fold)       ; UFO equivalent on Emacs 30+ treesit
 (elpaca electric-operator)
@@ -68,7 +68,8 @@
     (astraea//bind-core-keys)
     (astraea/layers--run-config)))
 
-;; convenient tree toggle bound to leader(defun astraea/toggle-file-tree ()
+;; convenient tree toggle bound to leader
+(defun astraea/toggle-file-tree ()
   "Toggle treemacs; fall back to dired."
   (interactive)
   (if (fboundp 'treemacs)

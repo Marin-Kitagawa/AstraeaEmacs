@@ -27,7 +27,7 @@
   (setq prefix-help-command #'embark-prefix-help-command))
 (elpaca embark-consult)
 (elpaca consult-dir)
-(elpaca nerd-icons-completing-read)
+(elpaca nerd-icons-completion)
 
 (with-eval-after-load 'vertico
   (define-key vertico-map (kbd "C-j") #'vertico-next)
@@ -56,7 +56,7 @@
 ;; ── snippets (LuaSnip equivalent) ────────────────────────────────────────
 (elpaca yasnippet
   (yas-global-mode 1))
-(elpaca doom-snippets)              ; big snippet collection
+(elpaca yasnippet-snippets)         ; big snippet collection
 
 ;; ── terminal corfu fallback ─────────────────────────────────────────────
 (elpaca corfu-terminal

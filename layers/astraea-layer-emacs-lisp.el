@@ -1,7 +1,7 @@
 ;;; astraea-layer-emacs-lisp.el --- Astraea layer: +lang/emacs-lisp -*- lexical-binding: t; -*-
 
 (astraea-layer! +lang/emacs-lisp
-  :packages (elisp-demos suggest macrostep flycheck-package)
+  :packages (elisp-demos suggest macrostep)
   :init
   (progn
     (elpaca elisp-demos)

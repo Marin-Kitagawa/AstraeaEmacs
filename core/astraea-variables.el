@@ -33,7 +33,7 @@ installed (smaller footprint, faster startup)."
   "Local leader key for mode-specific keybinds."
   :type 'key)
 
-(defcustom astraea-theme 'astraea-dark
+(defcustom astraea-theme 'doom-one
   "Default theme.  Set to a symbol loaded by `load-theme'."
   :type 'symbol)
 

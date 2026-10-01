@@ -42,10 +42,9 @@
 ;; ── Debugging: dape (nvim-dap equivalent) ───────────────────────────────
 (elpaca dape)
 
-;; ── Diagnostics ─────────────────────────────────────────────────────────
-(elpaca flymake
-  (setq flymake-no-changes-timeout 0.5
-        flymake-start-on-flymake-mode t))
+;; ── Diagnostics (flymake is built into Emacs 30+) ───────────────────────
+(setq flymake-no-changes-timeout 0.5
+      flymake-start-on-flymake-mode t)
 (elpaca flymake-collection)
 (elpaca flymake-popon)                ; inline diagnostic popups (noice feel)
 

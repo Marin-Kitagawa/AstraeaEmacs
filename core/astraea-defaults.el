@@ -63,9 +63,9 @@
     (define-key evil-insert-state-map (kbd "j") #'evil-next-visual-line) ; placeholder
     (setq evil-escape-key-sequence nil)))
 
-;; Server: emacsclient support
+;; Server: emacsclient support (skip in batch/non-GUI sessions)
 (require 'server)
-(unless (server-running-p) (server-start))
+(unless (or noninteractive (server-running-p)) (server-start))
 
 (provide 'astraea-defaults)
 ;;; astraea-defaults.el ends here

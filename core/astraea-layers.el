@@ -38,11 +38,12 @@ Example:
   (declare (indent defun))
   (let ((p (cl-loop for (k v) on body by #'cddr collect (cons k v))))
     `(progn
-       (put ',name 'astraea-layer (list
-        :packages ',(mapcar #'car (alist-get :packages p))
-        :init ',(alist-get :init p)
-        :config ',(alist-get :config p)
-        :keybinds ',(alist-get :keybinds p)))
+       (put ',name 'astraea-layer
+            (list
+             :packages ',(alist-get :packages p)
+             :init (lambda () ,@(alist-get :init p))
+             :config (lambda () ,@(alist-get :config p))
+             :keybinds (lambda () ,@(alist-get :keybinds p))))
        ',name)))
 
 (defun astraea/layers--declare-file-layer (name file)

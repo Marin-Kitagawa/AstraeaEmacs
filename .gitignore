@@ -1,0 +1,6 @@
+# elpaca runtime state (packages, builds, caches) — not part of the framework
+/elpaca/
+history
+out.txt
+err.txt
+*~

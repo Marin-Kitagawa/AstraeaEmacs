@@ -13,19 +13,25 @@
   "Current Astraea Emacs version.")
 
 ;; ── Elpaca bootstrap (async, parallel-capable package manager) ───────────
-(defvar elpaca-installer-version 0.8)
+(defvar elpaca-installer-version 0.12)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
 (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
 (defvar elpaca-order
   '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-           :ref nil :depth 1 :wait t
+           :ref nil :depth 1 :inherit ignore
            :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-           :build (:not elpaca--activate-package)))
+           :build (:not elpaca-activate)))
 
 (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
        (build (expand-file-name "elpaca/" elpaca-builds-directory))
-       (source (if (file-exists-p build) build repo)))
+       (source (cond
+                ;; prefer a complete build (has autoloads or the library)
+                ((or (file-exists-p (expand-file-name "elpaca-autoloads.el" build))
+                     (file-exists-p (expand-file-name "elpaca.el" build)))
+                 build)
+                ((file-exists-p (expand-file-name "elpaca.el" repo)) repo)
+                (t repo))))
   ;; Clone elpaca via git if absent (works everywhere git exists).
   (unless (file-exists-p repo)
     (make-directory elpaca-repos-directory t)
@@ -38,6 +44,7 @@
           (user-error "Astraea: failed to clone elpaca; see *elpaca-bootstrap*: %s"
                       (buffer-string))))))
   (add-to-list 'load-path source)
+  ;; Windows cannot create symlinks without Developer Mode/admin: copy instead.
   ;; The source repo does not ship generated autoloads; load every library
   ;; explicitly in dependency order.  After elpaca builds itself,
   ;; builds/elpaca has autoloads and we use those instead.
@@ -48,6 +55,9 @@
                    elpaca-manager elpaca-menu-elpa elpaca-menu-melpa
                    elpaca-menu-org elpaca-tar))
       (require lib))))
+;; Windows cannot create symlinks without Developer Mode/admin: copy instead.
+(when (eq system-type 'windows-nt)
+  (elpaca-no-symlink-mode 1))
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
 

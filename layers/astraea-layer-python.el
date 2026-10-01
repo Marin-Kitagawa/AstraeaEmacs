@@ -4,9 +4,10 @@
 ;; scimax / data-science workflow.
 
 (astraea-layer! +lang/python
-  :packages (python-mode? pet jupyter)
+  :packages (pyvenv jupyter)
   :init
   (progn
+    (elpaca pyvenv)
     ;; LSP: pyright or pylsp via eglot; formatter: ruff; checker: ruff
     (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver" "--stdio")))
     (add-hook 'python-mode-hook #'eglot-ensure)
