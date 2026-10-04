@@ -9,7 +9,7 @@
 (require 'cl-lib)
 (require 'map)
 
-(defconst astraea-version "0.1.0"
+(defconst astraea-version "0.4.0"
   "Current Astraea Emacs version.")
 
 (defvar astraea--ci nil
