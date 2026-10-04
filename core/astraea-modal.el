@@ -58,20 +58,43 @@
 ;; config if you want a custom normal-state layout.
 
 ;; ── Engine selection ──────────────────────────────────────────────────────
+(defvar astraea--evil-insert-map-backup nil
+  "Pristine copy of `evil-insert-state-map', captured before hybrid
+mode wipes it, so switching back to plain evil restores vim bindings.")
+
+(defun astraea/modal--hybrid-insert (emacs-style)
+  "Make evil insert state use native Emacs bindings when EMACS-STYLE
+is non-nil; restore the default vim insert bindings otherwise.
+ESC and evil-escape (jk) always return to normal state."
+  (when (and (boundp 'evil-insert-state-map) (keymapp evil-insert-state-map))
+    (unless astraea--evil-insert-map-backup
+      (setq astraea--evil-insert-map-backup (copy-keymap evil-insert-state-map)))
+    (if emacs-style
+        (progn
+          ;; wipe the vim insert bindings: unbound keys fall through to the
+          ;; global Emacs map, which is exactly what hybrid wants
+          (setcdr evil-insert-state-map nil)
+          (define-key evil-insert-state-map [escape] #'evil-normal-state)
+          (define-key evil-insert-state-map (kbd "C-[") #'evil-normal-state))
+      (setcdr evil-insert-state-map (cdr astraea--evil-insert-map-backup)))))
+
 (defun astraea/modal--activate (style)
   "Turn on modal engine STYLE, turning the other off."
   (interactive
    (list (intern (completing-read "Modal style: " '(evil meow hybrid)))))
   (cl-case style
     (meow
-     (when (and (fboundp 'meow-global-mode) (fboundp 'astraea//install-leader))
+     (when (bound-and-true-p evil-mode)
+       (evil-mode -1))
+     (when (fboundp 'meow-global-mode)
        (meow-global-mode 1))
      (message "Astraea: meow mode"))
     ((evil hybrid)
+     (when (bound-and-true-p meow-global-mode)
+       (meow-global-mode -1))
      (when (fboundp 'evil-mode)
        (evil-mode 1))
-     (when (eq style 'hybrid)
-       (setcar evil-insert-state-map "ESC" nil))
+     (astraea/modal--hybrid-insert (eq style 'hybrid))
      (message "Astraea: %s mode" style))
     (t (user-error "Unknown modal style: %s" style)))
   (setq astraea-modal-style style)

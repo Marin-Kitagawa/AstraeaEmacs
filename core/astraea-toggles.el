@@ -28,7 +28,7 @@ When :mode is given, :status/:on/:off default to that minor mode."
        (defun ,fname ()
          ,(format "Toggle %s.\n\n%s" name doc)
          (interactive)
-         (if ,status ,off-name ,on-name)
+         (if ,status (funcall #',off-name) (funcall #',on-name))
          ,(when (or key gkey)
             `(message "%s: %s" ,(capitalize (symbol-name name))
                       (if ,status "enabled" "disabled"))))
@@ -128,14 +128,15 @@ When :mode is given, :status/:on/:off default to that minor mode."
 
 (astraea|add-toggle menu-bar
   :global-key "T m"
-  :status menu-bar-mode
+  :status (and menu-bar-mode (or (not (numberp menu-bar-mode)) (> menu-bar-mode 0)))
   :on (menu-bar-mode 1)
   :off (menu-bar-mode -1)
   :documentation "Toggle the menu bar.")
 
 (astraea|add-toggle tool-bar
   :global-key "T t"
-  :status (and (boundp 'tool-bar-mode) tool-bar-mode)
+  :status (and (bound-and-true-p tool-bar-mode)
+               (or (not (numberp tool-bar-mode)) (> tool-bar-mode 0)))
   :on (tool-bar-mode 1)
   :off (tool-bar-mode -1)
   :documentation "Toggle the tool bar.")

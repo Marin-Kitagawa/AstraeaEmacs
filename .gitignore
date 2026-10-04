@@ -25,3 +25,7 @@ org-persist/
 /server
 /server/
 tests/probe-result.txt
+
+# byte-compile artifacts (stray .elc shadow sources via load-prefer-newer)
+*.elc
+.elc-out/

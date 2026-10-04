@@ -67,7 +67,7 @@
 
 (defun astraea/whole-buffer-command (cmd)
   "Run region-or-buffer CMD (`sort-lines' style) over the whole buffer."
-  (let (( deactivate-mark nil))
+  (let ((deactivate-mark nil))
     (if (use-region-p)
         (call-interactively cmd)
       (save-excursion

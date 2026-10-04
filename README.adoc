@@ -334,7 +334,7 @@ image::keybindings.svg[Leader keymap tree]
 | `SPC e` / `SPC E`
 | flymake diagnostics (buffer / project)
 
-| `SPC x`
+| `SPC x q`
 | consult-flymake — quickfix-style list
 |===
 
@@ -535,6 +535,27 @@ backed by tab-bar with per-project naming.
 
 | `SPC q r`
 | restart Emacs (restart-emacs) — restores session
+
+| `SPC q R`
+| re-evaluate `~/.astraea.d/init.el` — reload config, theme and modal style
+|===
+
+=== Appearance — `SPC T`
+
+|===
+| key | command
+
+| `SPC T h`
+| live theme switch with completion over every installed theme
+
+| `SPC T c`
+| Catppuccin flavor picker (latte / frappe / macchiato / mocha)
+
+| `SPC T o`
+| cycle frame transparency: opaque → 95 → 90 → 85 → opaque
+
+| `SPC T F`
+| cycle frame state: normal → maximized → fullscreen
 |===
 
 === Text utilities — `SPC x`

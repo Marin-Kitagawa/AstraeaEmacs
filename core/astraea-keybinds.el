@@ -90,7 +90,7 @@ message instead of aborting bootstrap."
    "c i" #'eglot-find-implementation
    "e"   #'flymake-show-buffer-diagnostics
    "E"   #'flymake-show-project-diagnostics
-   "x"   #'consult-flymake              ; quickfix equivalent
+   "x q" #'consult-flymake              ; quickfix equivalent (SPC x = text prefix)
    ;; windows (astronvim SPC w)
    "w c" #'evil-window-delete
    "w v" #'evil-window-vsplit
@@ -130,7 +130,6 @@ message instead of aborting bootstrap."
    "t n" #'astraea/toggle-line-numbers-style
    "t F" #'auto-fill-mode
    "t ." #'astraea/toggle-transient
-   "t f" #'astraea/cycle-fullscreen
 ;; help (helpful-enhanced)
    "h f" #'helpful-function
    "h v" #'helpful-variable
@@ -165,7 +164,13 @@ message instead of aborting bootstrap."
    ;; notes & research extras
    "n j" #'org-journal-new-entry
    "n P" #'org-present
-   "n w" #'astraea/research-menu))
+   "n w" #'astraea/research-menu
+   ;; appearance (live theme / transparency)
+   "T h" #'astraea/set-theme
+   "T c" #'astraea/catppuccin-flavor
+   "T o" #'astraea/cycle-frame-alpha
+   ;; config reload
+   "q R" #'astraea/reload-user-config))
 
 ;; ── Transient menus (spacemacs-style popups with discoverability) ────────
 (transient-define-prefix astraea/transient-git ()
@@ -205,7 +210,26 @@ message instead of aborting bootstrap."
 (elpaca which-key
   (which-key-mode 1)
   (setq which-key-use-C-h-commands t
-        which-key-show-remaining-keys t))
+        which-key-show-remaining-keys t)
+  ;; name the leader prefixes so menus read like astronvim's
+  (which-key-add-key-based-replacements
+    "SPC b" "buffers"
+    "SPC f" "files"
+    "SPC s" "search"
+    "SPC j" "jump"
+    "SPC c" "code"
+    "SPC w" "windows"
+    "SPC t" "toggles"
+    "SPC T" "frame & appearance"
+    "SPC g" "git"
+    "SPC q" "quit / restart"
+    "SPC n" "notes & research"
+    "SPC x" "text"
+    "SPC m" "mode tools"
+    "SPC i" "insert emoji"
+    "SPC d" "docker"
+    "SPC z" "zoom"
+    "SPC u" "universal argument"))
 
 (provide 'astraea-keybinds)
 ;;; astraea-keybinds.el ends here

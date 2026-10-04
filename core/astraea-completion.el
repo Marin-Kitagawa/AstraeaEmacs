@@ -63,7 +63,7 @@
 
 ;; ── terminal corfu fallback ─────────────────────────────────────────────
 (elpaca corfu-terminal
-  (unless (display-graphic-p)
+  (unless (or noninteractive (display-graphic-p))
     (corfu-terminal-mode +1)))
 
 (provide 'astraea-completion)

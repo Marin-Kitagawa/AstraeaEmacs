@@ -17,8 +17,7 @@
 (defun astraea/w--shrink-v () (interactive) (shrink-window 4))
 (defun astraea/w--enlarge-v () (interactive) (enlarge-window 4))
 (defun astraea/w--rotate () (interactive)
-  (if-let* ((frames (frame-list)))
-      (rotate-windows-if-available)))
+  (astraea/rotate-windows))
 
 (transient-define-prefix astraea/window-transient ()
   "Window transient state (spacemacs `w.')."

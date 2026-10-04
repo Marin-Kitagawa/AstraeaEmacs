@@ -79,6 +79,7 @@
 (require 'astraea-modal)
 (require 'astraea-keybinds)
 (require 'astraea-ui)
+(require 'astraea-appearance)
 (require 'astraea-completion)
 (require 'astraea-ide)
 (require 'astraea-org)
@@ -149,13 +150,20 @@ processing and finalization — only module loading is validated.")
   "Finalize Astraea: theme, leader keys, layer configs.  Runs once."
   (unless astraea--init-finished
     (setq astraea--init-finished t)
-    ;; font: apply and persist across frames
-    (when astraea-font
+    ;; font: apply and persist across frames (batch sessions have no real frame)
+    (when (and astraea-font (display-graphic-p))
       (let ((spec (format "%s-%s" astraea-font astraea-font-size)))
         (set-frame-font spec nil t)
         (add-to-list 'default-frame-alist (cons 'font spec))))
-    (astraea/modal--activate astraea-modal-style)
-    (astraea/ui//finish)
+    ;; modal and UI are independent: one failing must not break the other
+    (condition-case err
+        (astraea/modal--activate astraea-modal-style)
+      (error (message "Astraea: modal setup failed: %s"
+                      (error-message-string err))))
+    (condition-case err
+        (astraea/ui//finish)
+      (error (message "Astraea: UI setup failed: %s"
+                      (error-message-string err))))
     (run-hooks 'astraea-after-init-hook)
     (when astraea-startup-benchmark
       (astraea/report-startup-time))
@@ -164,6 +172,40 @@ processing and finalization — only module loading is validated.")
              (float-time (time-subtract (current-time) before-init-time))
              (length astraea--enabled-layers)
              astraea-modal-style)))
+
+;; ── Package upgrades (topgrade-friendly) ─────────────────────────────────
+;; package.el doesn't own Astraea's packages — elpaca does.  Route
+;; `package-upgrade-all' (what topgrade calls) through elpaca instead of
+;; letting it churn on an unrelated package.el database.  package.el is
+;; loaded eagerly so topgrade's (featurep 'package) check succeeds.
+(defun astraea/upgrade-packages ()
+  "Update and rebuild every elpaca-managed package."
+  (interactive)
+  (require 'elpaca)
+  (elpaca-process-queues)
+  (elpaca-update-all t)
+  ;; elpaca works asynchronously; batch callers (topgrade) must not exit
+  ;; before the upgrade processes have finished
+  (when noninteractive
+    (elpaca-wait)))
+
+(require 'package nil t)
+(defun astraea//package-upgrade-all-advice (&optional _no-query)
+  "Replacement for `package-upgrade-all' — elpaca owns the packages."
+  (astraea/upgrade-packages))
+(when (fboundp 'package-upgrade-all)
+  (advice-add 'package-upgrade-all :override
+              #'astraea//package-upgrade-all-advice))
+
+(defun astraea/reload-user-config ()
+  "Re-evaluate ~/.astraea.d/init.el and re-apply UI, theme and modal style."
+  (interactive)
+  (setq astraea--enabled-layers nil
+        astraea--layers-initialized nil
+        astraea--init-finished nil)
+  (load (expand-file-name "init.el" astraea-user-directory) nil 'nomessage)
+  (astraea//finish-init)
+  (message "Astraea: user config reloaded"))
 
 (provide 'astraea-init)
 ;;; astraea-init.el ends here

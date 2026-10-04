@@ -6,7 +6,8 @@
 (when astraea-fun-enabled
   ;; ── emoji ──────────────────────────────────────────────────────────
   (elpaca emojify
-    (global-emojify-mode 1))
+    (unless noninteractive
+      (global-emojify-mode 1)))
 
   ;; built-in emoji picker (Emacs 31): C-x 8 e e / s / r
   (with-eval-after-load 'astraea-keybinds
