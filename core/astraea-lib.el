@@ -3,6 +3,17 @@
 (require 'cl-lib)
 (require 'map)
 
+;; Load-safety: core modules call the `elpaca' macro at top level.  When
+;; modules are loaded WITHOUT elpaca present (e.g. byte-compilation of
+;; astraea-init.el pulls them in via require), provide a no-op fallback so
+;; loading never signals void-function.  Loading elpaca.el later redefines
+;; the real macro.
+(unless (fboundp 'elpaca)
+  (defmacro elpaca (&rest _ignored)
+    "No-op fallback for the real `elpaca' macro (not loaded yet)."
+    (ignore)
+    nil))
+
 (defmacro astraea/after! (feature &rest body)
   "Evaluate BODY after FEATURE is loaded (defer-safe).
 Like `with-eval-after-load' but accepts a list of features and

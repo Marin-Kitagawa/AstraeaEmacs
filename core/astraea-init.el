@@ -12,49 +12,66 @@
 (defconst astraea-version "0.1.0"
   "Current Astraea Emacs version.")
 
+(defvar astraea--ci nil
+  "When non-nil (CI smoke tests), `astraea/init' skips package queue
+processing and finalization — only module loading is validated.
+Defined early so test drivers can set it before anything loads.")
+
 ;; ── Elpaca bootstrap (async, parallel-capable package manager) ───────────
 (defvar elpaca-installer-version 0.12)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
-(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory)
+  "Legacy elpaca checkout location (pre-rename).")
+(defvar elpaca-sources-directory (expand-file-name "sources/" elpaca-directory)
+  "Elpaca's package-source directory.  Defined here so the value
+survives loading elpaca.el (defvar won't override), and so the
+bootstrap clones into the layout elpaca actually reads — newer
+elpaca renamed repos/ to sources/.")
 (defvar elpaca-order
   '(elpaca :repo "https://github.com/progfolio/elpaca.git"
            :ref nil :depth 1 :inherit ignore
            :files (:defaults "elpaca-test.el" (:exclude "extensions"))
            :build (:not elpaca-activate)))
 
-(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
-       (build (expand-file-name "elpaca/" elpaca-builds-directory))
-       (source (cond
-                ;; prefer a complete build (has autoloads or the library)
-                ((or (file-exists-p (expand-file-name "elpaca-autoloads.el" build))
-                     (file-exists-p (expand-file-name "elpaca.el" build)))
-                 build)
-                ((file-exists-p (expand-file-name "elpaca.el" repo)) repo)
-                (t repo))))
-  ;; Clone elpaca via git if absent (works everywhere git exists).
-  (unless (file-exists-p repo)
-    (make-directory elpaca-repos-directory t)
-    (let ((log (get-buffer-create "*elpaca-bootstrap*")))
-      (unless (zerop (call-process "git" nil log t
-                                   "clone" "--filter=blob:none"
-                                   "https://github.com/progfolio/elpaca.git"
-                                   repo))
-        (with-current-buffer log
-          (user-error "Astraea: failed to clone elpaca; see *elpaca-bootstrap*: %s"
-                      (buffer-string))))))
-  (add-to-list 'load-path source)
-  ;; Windows cannot create symlinks without Developer Mode/admin: copy instead.
-  ;; The source repo does not ship generated autoloads; load every library
-  ;; explicitly in dependency order.  After elpaca builds itself,
-  ;; builds/elpaca has autoloads and we use those instead.
-  (if (file-exists-p (expand-file-name "elpaca-autoloads.el" source))
-      (require 'elpaca-autoloads)
-    (require 'elpaca)                 ; pulls elpaca-process
-    (dolist (lib '(elpaca-ui elpaca-file elpaca-git elpaca-info elpaca-log
-                   elpaca-manager elpaca-menu-elpa elpaca-menu-melpa
-                   elpaca-menu-org elpaca-tar))
-      (require lib))))
+(defun astraea//bootstrap-elpaca ()
+  "Clone elpaca via git if absent and put it on `load-path'."
+  (let* ((repo (expand-file-name "elpaca/" elpaca-sources-directory))
+         (build (expand-file-name "elpaca/" elpaca-builds-directory))
+         (legacy (expand-file-name "elpaca/" elpaca-repos-directory))
+         (source (cond
+                  ;; prefer a complete build (has autoloads or the library)
+                  ((or (file-exists-p (expand-file-name "elpaca-autoloads.el" build))
+                       (file-exists-p (expand-file-name "elpaca.el" build)))
+                   build)
+                  ((file-exists-p (expand-file-name "elpaca.el" repo)) repo)
+                  ((file-exists-p (expand-file-name "elpaca.el" legacy)) legacy)
+                  (t repo))))
+    (unless (or (file-exists-p repo) (file-exists-p legacy))
+      (make-directory elpaca-sources-directory t)
+      (let ((log (get-buffer-create "*elpaca-bootstrap*")))
+        (unless (zerop (call-process "git" nil log t
+                                     "clone" "--filter=blob:none"
+                                     "https://github.com/progfolio/elpaca.git"
+                                     repo))
+          (with-current-buffer log
+            (user-error "Astraea: failed to clone elpaca; see *elpaca-bootstrap*: %s"
+                        (buffer-string))))))
+    (add-to-list 'load-path source)
+    ;; Windows cannot create symlinks without Developer Mode/admin: the
+    ;; source repo does not ship generated autoloads, so load every
+    ;; library explicitly in dependency order.  After elpaca builds
+    ;; itself, builds/elpaca has autoloads and we use those instead.
+    (if (file-exists-p (expand-file-name "elpaca-autoloads.el" source))
+        (require 'elpaca-autoloads)
+      (require 'elpaca)                 ; pulls elpaca-process
+      (dolist (lib '(elpaca-ui elpaca-file elpaca-git elpaca-info elpaca-log
+                     elpaca-manager elpaca-menu-elpa elpaca-menu-melpa
+                     elpaca-menu-org elpaca-tar))
+        (require lib)))))
+
+;; ── Elpaca bootstrap (async, parallel-capable package manager) ───────────
+(astraea//bootstrap-elpaca)
 ;; Windows cannot create symlinks without Developer Mode/admin: copy instead.
 ;; Also cap concurrent git clones — Git for Windows can crash with an
 ;; access violation under heavy parallel load.
@@ -123,10 +140,6 @@
                 always (cl-loop for (_ . e) in (elpaca-q<-elpacas q)
                                 always (memq (elpaca<-status e)
                                              '(finished failed))))))
-
-(defvar astraea--ci nil
-  "When non-nil (CI smoke tests), `astraea/init' skips package queue
-processing and finalization — only module loading is validated.")
 
 (defun astraea/init ()
   "Complete Astraea bootstrap. Call this at the END of your user init file."

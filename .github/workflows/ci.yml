@@ -33,10 +33,17 @@ jobs:
       - name: Byte-compile core, layers and tests (warnings allowed, errors fatal)
         run: |
           mkdir -p .elc-out
+          # keep .elc out of the source tree: compile-time `require' of a
+          # sibling module would load its .elc (whose elpaca macro calls
+          # became plain function calls) instead of the macro-safe source
+          setdest='(setq byte-compile-dest-file-function
+                         (lambda (f) (concat (file-name-nondirectory f) "c")))'
           fail=0
           for f in $(git ls-files '*.el'); do
-            case "$f" in *elpaca*) continue;; esac
-            out=$(emacs --batch -Q -f batch-byte-compile "$f" 2>&1) || { echo "ERROR in $f:"; echo "$out"; fail=1; }
+            # init.el executes the elpaca bootstrap when loaded at compile
+            # time; entry points are not worth compiling in CI
+            case "$f" in init.el|early-init.el|*elpaca*) continue;; esac
+            out=$(emacs --batch -Q -L core -L layers -L modules/ox-manuscript --eval "$setdest" -f batch-byte-compile "$f" 2>&1) || { echo "ERROR in $f:"; echo "$out"; fail=1; }
             if echo "$out" | grep -q "End of file during parsing"; then
               echo "TRUNCATED: $f"; fail=1
             fi
