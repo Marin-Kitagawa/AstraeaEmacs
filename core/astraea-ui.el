@@ -11,6 +11,39 @@
 ;;   flash.nvim        → avy
 ;;   snacks smooth UI  → pixel-scroll-precision + ultra-scroll
 
+;; ── Launch detection: were files given on the command line? ──────────────
+(defun astraea/ui//command-line-files-p ()
+  "Return non-nil when Emacs was invoked with files to visit.
+Inspects `command-line-args', which is still populated while the
+init files load.  Option names that take a separate value argument
+are skipped so that `-l FILE' or `--eval FORM' are not mistaken for
+file arguments."
+  (when (boundp 'command-line-args)
+    (let ((args (cdr command-line-args))
+          (value-opts '("-f" "--funcall" "-l" "--load" "--insert" "--kill"
+                        "-L" "--directory" "--eval" "--execute"
+                        "--find-file" "--visit" "--file" "--script"
+                        "--scripteval" "--dump-file" "--seccomp"
+                        "-T" "--name" "-name" "-title" "--title"
+                        "-fg" "--foreground-color" "-bg" "--background-color"
+                        "-color" "--reverse-video" "-reverse"
+                        "-geometry" "--geometry" "-xrm"))
+          (skip nil) (files nil) (end nil))
+      (while args
+        (let ((arg (pop args)))
+          (cond
+           (skip (setq skip nil))
+           (end (setq files t))
+           ((equal arg "--") (setq end t))
+           ((member arg value-opts) (setq skip t))
+           ((string-match-p "\\`--[^=]+=" arg) nil)
+           ((string-prefix-p "-" arg) nil)
+           (t (setq files t)))))
+      files)))
+
+(defvar astraea/ui--launched-with-files (astraea/ui//command-line-files-p)
+  "Non-nil when Emacs was started with files to visit on the command line.")
+
 ;; ── Icons ─────────────────────────────────────────────────────────────────
 (elpaca nerd-icons)
 (elpaca nerd-icons-corfu)
@@ -37,8 +70,11 @@
       (when (fboundp 'nerd-icons-codicon)
         (setq dashboard-footer-icon
               (nerd-icons-codicon "nf-cod-sparkle" :height 1.2 :face 'nerd-icons-pink))))
-    ;; show the dashboard on launch (skip in batch: no frame to display it)
-    (unless noninteractive
+    ;; Show the dashboard on launch (skip in batch: no frame to display it).
+    ;; When files were given on the command line, Emacs displays those itself;
+    ;; forcing `initial-buffer-choice' here would open the dashboard *and* the
+    ;; file in a split frame (see the display logic in lisp/startup.el).
+    (unless (or noninteractive astraea/ui--launched-with-files)
       (setq initial-buffer-choice
             (lambda ()
               (or (get-buffer dashboard-buffer-name)
@@ -53,10 +89,77 @@
     (setq mood-line-format (mood-line-format-text-packed)))
   (mood-line-mode 1))
 
+;; ── Tab bar: one tab per open file (bufferline) ──────────────────────────
 (when (display-graphic-p)
+  (require 'tab-bar)
   (tab-bar-mode 1)
-  (setq tab-bar-show 1
-        tab-bar-close-button-show nil))
+  (setq tab-bar-show 0                ; always visible so file tabs are seen
+        tab-bar-close-button-show nil
+        tab-bar-new-tab-to 'right))
+
+(defcustom astraea-buffer-tabs-enabled t
+  "When non-nil, visiting a file gives it its own tab in the tab bar.
+Each tab is named after its buffer, so tabs stay dedicated to a single
+file: opening a file selects its tab, killing the buffer closes the tab."
+  :type 'boolean
+  :group 'tab-bar)
+
+(defun astraea/buffer-tabs--index (buffer)
+  "Return the 0-based index of the tab named after BUFFER, or nil."
+  (when (fboundp 'tab-bar--tab-index-by-name)
+    (tab-bar--tab-index-by-name (buffer-name buffer))))
+
+(defun astraea/buffer-tabs--file-buffer-p (buffer)
+  "Return non-nil if BUFFER visits a real file (ignores internal buffers)."
+  (and (bufferp buffer)
+       (buffer-live-p buffer)
+       (buffer-file-name buffer)
+       (not (string-prefix-p " " (buffer-name buffer)))))
+
+(defun astraea/buffer-tabs--show (buffer)
+  "Show BUFFER in its own tab, creating or reusing that tab.
+Returns the window displaying BUFFER."
+  (let ((index (astraea/buffer-tabs--index buffer)))
+    (if index
+        (progn
+          (unless (eql index (tab-bar--current-tab-index))
+            (tab-bar-select-tab (1+ index)))
+          (or (get-buffer-window buffer (selected-frame))
+              (selected-window)))
+      (let ((tab-bar-new-tab-choice t))
+        (tab-bar-new-tab)
+        (delete-other-windows)
+        (switch-to-buffer buffer))
+      (tab-bar-rename-tab (buffer-name buffer))
+      (or (get-buffer-window buffer (selected-frame))
+          (selected-window)))))
+
+(defun astraea/buffer-tabs--display (buffer alist)
+  "`display-buffer' action: route file buffers into their own tab.
+Non-file buffers (dired, help, …) still use the same window."
+  (if (and astraea-buffer-tabs-enabled
+           (astraea/buffer-tabs--file-buffer-p buffer))
+      (astraea/buffer-tabs--show buffer)
+    (display-buffer-same-window buffer alist)))
+
+(defun astraea/buffer-tabs--find-file (orig &rest args)
+  "Run `find-file' with file buffers opening in their own tab."
+  (if (and astraea-buffer-tabs-enabled (display-graphic-p))
+      (let ((display-buffer-overriding-action
+             (list 'astraea/buffer-tabs--display)))
+        (apply orig args))
+    (apply orig args)))
+
+(defun astraea/buffer-tabs--kill ()
+  "Close the tab belonging to the buffer being killed."
+  (when (and astraea-buffer-tabs-enabled
+             (astraea/buffer-tabs--index (current-buffer)))
+    (ignore-errors
+      (tab-bar-close-tab-by-name (buffer-name)))))
+
+(when (display-graphic-p)
+  (advice-add 'find-file :around #'astraea/buffer-tabs--find-file)
+  (add-hook 'kill-buffer-hook #'astraea/buffer-tabs--kill))
 
 ;; ── File tree (neo-tree equivalent) ──────────────────────────────────────
 (elpaca treemacs

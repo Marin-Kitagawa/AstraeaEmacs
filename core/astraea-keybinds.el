@@ -49,14 +49,14 @@ message instead of aborting bootstrap."
    "b d" #'kill-current-buffer
    "b D" #'kill-buffer
    "b i" #'ibuffer
-   "b n" #'next-buffer
-   "b p" #'previous-buffer
+   "b n" #'tab-bar-switch-to-next-tab
+   "b p" #'tab-bar-switch-to-prev-tab
    "b R" #'revert-buffer
    "b s" #'save-buffer
    "b S" #'save-some-buffers
    "b u" #'vundo                      ; undotree.nvim equivalent
-   "b [" #'previous-buffer
-   "b ]" #'next-buffer
+   "b [" #'tab-bar-switch-to-prev-tab
+   "b ]" #'tab-bar-switch-to-next-tab
    ;; files (astronvim SPC f)
    "f f" #'find-file
    "f F" #'find-file-other-window
