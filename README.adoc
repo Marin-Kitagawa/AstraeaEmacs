@@ -54,7 +54,7 @@ installed, share one keymap, and can be swapped with a single command.
 
 [source,powershell]
 ----
-git clone https://github.com/astraea-emacs/astraea ~/projects/astraea-emacs
+git clone https://github.com/Marin-Kitagawa/astraea-emacs ~/projects/astraea-emacs
 runemacs.exe   # or: emacs --init-directory ~/projects/astraea-emacs
 ----
 
