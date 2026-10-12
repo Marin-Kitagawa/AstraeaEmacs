@@ -93,6 +93,9 @@ elpaca renamed repos/ to sources/.")
 (require 'astraea-performance)
 (require 'astraea-defaults)
 (require 'astraea-layers)
+;; Register the file layers shipped in layers/ so the user config can
+;; enable them by symbol.  Must run before the user config is loaded.
+(astraea/layers--discover-file-layers)
 (require 'astraea-modal)
 (require 'astraea-keybinds)
 (require 'astraea-ui)
