@@ -318,5 +318,18 @@ Derives colors from the `default' face so any theme stays consistent."
     (setq poke-line-pokemon "pikachu"
           poke-line-bar-length 18)))
 
+;; `mood-line' replaces the whole mode line, so `nyan-mode' and `poke-line'
+;; (which append to the stock `mode-line-position') would never show.  Expose
+;; them as mood-line segments instead, rendered only while each mode is on.
+(when astraea-effects-enabled
+  (with-eval-after-load 'mood-line
+    (setq mood-line-format
+          (list (append (car mood-line-format)
+                        (list '(when (bound-and-true-p nyan-mode) (nyan-create)) "  "
+                              '(when (bound-and-true-p poke-line-global-mode)
+                                 (poke-line-create))
+                              "  "))
+                (cadr mood-line-format)))))
+
 (provide 'astraea-ui)
 ;;; astraea-ui.el ends here
