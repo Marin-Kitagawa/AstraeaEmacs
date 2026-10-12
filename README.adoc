@@ -1092,6 +1092,15 @@ Available diagrams: `architecture`, `layers`, `modal`, `stacks`, `keybindings`.
 * **Emoji & fun** — emojify everywhere, built-in emoji pickers, arcade
   (Tetris/Snake/Pong/Gomoku/Life/Dunnet/Zone), xkcd. Opt out with
   `astraea-fun-enabled nil`.
+* **Eye-candy effects** — NeoVim-flavoured flourish: `ultra-scroll`
+  (buttery pixel scrolling), `beacon` (a light beam at point after
+  jumps/scrolls), `pulsar` (pulse the line or region after motions),
+  `nav-flash` (flash the line you land on), `nyan-mode` (a cat running
+  across the mode line) and `poke-line` (a Pokemon strolling along the
+  mode line). Flip each one from the effects transient (`SPC t e`) or its
+  `SPC T` toggle; disable the whole group with
+  `astraea-effects-enabled nil`. `beacon`, `nyan-mode` and `ultra-scroll`
+  are on by default; `pulsar`, `nav-flash` and `poke-line` start off.
 
 == License
 

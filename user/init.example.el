@@ -52,6 +52,12 @@
 ;; (setq astraea-discord-presence-enabled t)   ; Discord rich presence (elcord)
 ;; (setq astraea-wakatime-enabled t)           ; needs wakatime-cli on PATH
 
+;; ── 6b. Eye-candy effects ─────────────────────────────────────────────────
+;; Smooth scroll (ultra-scroll), a beacon light at point, pulsar pulses,
+;; nav-flash, and mode-line pets (nyan-cat / poke-line).  Flip them live
+;; with `SPC t e'; turn the whole group off here instead:
+;; (setq astraea-effects-enabled nil)
+
 ;; ── 7. Anything else — plain Emacs Lisp ───────────────────────────────────
 ;; Handy appearance commands:
 ;;   M-x astraea/set-theme         live theme switch with completion

@@ -141,5 +141,37 @@ When :mode is given, :status/:on/:off default to that minor mode."
   :off (tool-bar-mode -1)
   :documentation "Toggle the tool bar.")
 
+;; ── eye-candy effects (also in the SPC t e transient) ────────────────
+(when astraea-effects-enabled
+  (astraea|add-toggle ultra-scroll
+    :mode ultra-scroll-mode
+    :global-key "T u"
+    :documentation "Fast, jump-free pixel-precision scrolling.")
+
+  (astraea|add-toggle beacon
+    :mode beacon-mode
+    :global-key "T b"
+    :documentation "Flash a light beam at point after jumps/scrolls.")
+
+  (astraea|add-toggle pulsar
+    :mode pulsar-global-mode
+    :global-key "T p"
+    :documentation "Pulse the current line/region after jumps and edits.")
+
+  (astraea|add-toggle nav-flash
+    :mode astraea/nav-flash-mode
+    :global-key "T f"
+    :documentation "Flash the line the point lands on after a jump.")
+
+  (astraea|add-toggle nyan-cat
+    :mode nyan-mode
+    :global-key "T n"
+    :documentation "Nyan Cat runs across the mode line.")
+
+  (astraea|add-toggle poke-line
+    :mode poke-line-global-mode
+    :global-key "T k"
+    :documentation "A Pokemon strolls along the mode line."))
+
 (provide 'astraea-toggles)
 ;;; astraea-toggles.el ends here

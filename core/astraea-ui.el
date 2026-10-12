@@ -235,5 +235,85 @@ Derives colors from the `default' face so any theme stays consistent."
     (_ (set-frame-parameter nil 'fullscreen 'maximized))))
 (global-set-key (kbd "<f11>") #'astraea/cycle-fullscreen)
 
+;; ── Eye-candy effects: smooth scroll, cursor glow, mode-line pets ────────
+;; Neovim-flavoured flourish, Emacs edition.  Flip individual effects from
+;; the effects transient (SPC t e) or with their SPC T toggles; disable the
+;; whole group with (setq astraea-effects-enabled nil).
+
+;; `nav-flash' ships only a function plus recommended hooks and no mode of
+;; its own, so wrap it in one to give it an honest toggle.
+(defvar astraea/nav-flash-hooks
+  '(imenu-after-jump-hook
+    xref-after-jump-hook
+    xref-after-return-hook
+    evil-jump-hook
+    consult-after-jump-hook
+    next-error-hook)
+  "Hooks on which `astraea/nav-flash-mode' flashes the landing line.")
+
+(define-minor-mode astraea/nav-flash-mode
+  "Flash the line point lands on after a navigation command."
+  :global t
+  :group 'astraea
+  (if astraea/nav-flash-mode
+      (dolist (hook astraea/nav-flash-hooks)
+        (add-hook hook #'nav-flash-show))
+    (dolist (hook astraea/nav-flash-hooks)
+      (remove-hook hook #'nav-flash-show))))
+
+(when astraea-effects-enabled
+  ;; ultra-scroll — fast, jump-free pixel scrolling (jdtsmith).  Replaces
+  ;; `pixel-scroll-precision' with a version that also scrolls past images.
+  (elpaca ultra-scroll
+    (setq ultra-scroll-hide-cursor t        ; hide point while scrolling
+          ultra-scroll-push-mark t          ; remember where you started
+          ultra-scroll-preserve-column t)   ; keep the column position
+    (ultra-scroll-mode 1))
+
+  ;; beacon — a soft light beam shines at point on scroll / jump.
+  (elpaca beacon
+    (setq beacon-color "#ff8fc7"            ; sakura pink
+          beacon-size 44
+          beacon-blink-delay 0.25
+          beacon-blink-when-window-scrolls t
+          beacon-blink-when-window-changes t
+          beacon-blink-when-buffer-changes t
+          beacon-blink-when-point-moves-vertically 10
+          beacon-push-mark nil)             ; ultra-scroll already pushes
+    (dolist (cmd '(next-line previous-line forward-line
+                   scroll-up-command scroll-down-command
+                   evil-next-line evil-previous-line
+                   evil-scroll-down evil-scroll-up mwheel-scroll))
+      (add-to-list 'beacon-dont-blink-commands cmd))
+    (beacon-mode 1))
+
+  ;; pulsar — pulse the line/region after jumps, edits, undo, window moves.
+  ;; Off by default (beacon already lights up jumps); enable with `SPC T p'.
+  (elpaca pulsar
+    (setq pulsar-face 'pulsar-magenta
+          pulsar-region-face 'pulsar-yellow
+          pulsar-highlight-face 'pulsar-cyan
+          pulsar-delay 0.055
+          pulsar-iterations 5
+          pulsar-pulse-on-window-change t))
+
+  ;; nav-flash — a quick flash of the line you land on after a jump.
+  ;; Off by default; enable with `SPC T f'.
+  (elpaca nav-flash
+    (setq nav-flash-delay 0.5))
+
+  ;; nyan-mode — the cat runs across your mode line (cute, forever).
+  (elpaca nyan-mode
+    (setq nyan-animate-nyancat t
+          nyan-wavy-trail t
+          nyan-bar-length 18)
+    (nyan-mode 1))
+
+  ;; poke-line — a tiny Pokemon strolls along the mode line.  Off by
+  ;; default: it shares nyan's mode-line slot.
+  (elpaca poke-line
+    (setq poke-line-pokemon "pikachu"
+          poke-line-bar-length 18)))
+
 (provide 'astraea-ui)
 ;;; astraea-ui.el ends here

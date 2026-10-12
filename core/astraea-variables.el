@@ -69,6 +69,19 @@ more features)."
   "Enable the emoji & fun layer (emojify, built-in games, xkcd)."
   :type 'boolean)
 
+(defcustom astraea-effects-enabled t
+  "Enable the eye-candy effects (smooth scroll, cursor glow, pets).
+This installs ultra-scroll (buttery pixel scrolling), beacon (a
+light beam at point after jumps/scrolls), pulsar (pulse the line
+or region after motions), nav-flash (flash the line you land on),
+nyan-mode (a cat running across the mode line) and poke-line (a
+Pokemon strolling along the mode line).
+
+Each effect can be flipped at runtime from the effects transient
+(\\[astraea/effects-transient], bound to `SPC t e') or as a toggle
+under `SPC T'."
+  :type 'boolean)
+
 (defcustom astraea-wakatime-enabled nil
   "Enable WakaTime tracking (requires the `wakatime-cli' binary)."
   :type 'boolean)
