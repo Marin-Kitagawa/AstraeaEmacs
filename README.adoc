@@ -512,6 +512,9 @@ backed by tab-bar with per-project naming.
 
 | +lang/python
 | `m v` pyvenv-activate, `m s` run-python, `m j` jupyter session
+
+| +lang/asciidoc
+| `m a p` preview, `m a l` live preview, `m a v` visual-line, `m a h`/`m a d`/`m a P`/`m a e` export html/docbook/pdf/epub
 |===
 
 === Help — `SPC h` (helpful-enhanced)

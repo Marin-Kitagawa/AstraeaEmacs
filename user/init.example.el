@@ -29,6 +29,7 @@
 (astraea/enable-layer '+lang/python)
 (astraea/enable-layer '+tools/docker)
 (astraea/enable-layer '+readers/rss-epub)
+(astraea/enable-layer '+lang/asciidoc)      ; AsciiDoc / Asciidoctor (adoc-mode)
 
 ;; Inline layers are declared right here:
 (astraea-layer! +personal/writeroom
