@@ -76,6 +76,23 @@
       (switch-to-buffer dashboard-buffer-name)
     (dashboard-open)))
 
+;; ── effects transient state (SPC t e) ────────────────────────────────
+
+(when astraea-effects-enabled
+  (transient-define-prefix astraea/effects-transient ()
+    "Eye-candy effects, NeoVim edition.  Staying open."
+    [["Scroll"
+      ("u" "ultra-scroll" astraea/toggle-ultra-scroll :transient t)
+      ("b" "beacon" astraea/toggle-beacon :transient t)]
+     ["Cursor"
+      ("p" "pulsar" astraea/toggle-pulsar :transient t)
+      ("f" "nav-flash" astraea/toggle-nav-flash :transient t)]
+     ["Mode line"
+      ("n" "nyan cat" astraea/toggle-nyan-cat :transient t)
+      ("k" "poke-line" astraea/toggle-poke-line :transient t)]
+     ["Quit"
+      ("q" "quit" transient-quit-one)]]))
+
 ;; ── restart (spacemacs SPC q group) — restart-emacs queued in toggles ─
 (with-eval-after-load 'astraea-keybinds
   (astraea/leader-def
@@ -90,7 +107,10 @@
   (astraea/leader-def
    "w ." #'astraea/window-transient
    "z x" #'astraea/scale-transient
-   "t t" #'astraea/toggle-transient))
+   "t t" #'astraea/toggle-transient)
+  (when astraea-effects-enabled
+    (astraea/leader-def
+     "t e" #'astraea/effects-transient)))
 
 (provide 'astraea-transients)
 ;;; astraea-transients.el ends here
