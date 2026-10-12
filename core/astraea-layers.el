@@ -36,6 +36,9 @@ Keywords:
   :defer BOOL       defer :config via `with-eval-after-load' (default t)
   :keybinds FORM    evaluated after leader map is installed
 
+Each of :init, :config and :keybinds takes a single FORM; wrap several
+expressions in a `progn'.
+
 Example:
   (astraea-layer! +lang/python
     :packages (pyvenv)
@@ -46,9 +49,9 @@ Example:
        (put ',name 'astraea-layer
             (list
              :packages ',(alist-get :packages p)
-             :init (lambda () ,@(alist-get :init p))
-             :config (lambda () ,@(alist-get :config p))
-             :keybinds (lambda () ,@(alist-get :keybinds p))))
+             :init (lambda () ,(alist-get :init p))
+             :config (lambda () ,(alist-get :config p))
+             :keybinds (lambda () ,(alist-get :keybinds p))))
        ;; When the layer is declared while a file layer is being discovered
        ;; (see `astraea/layers--discover-file-layers'), remember which file
        ;; defines it so `astraea/enable-layer' can load it on demand.  Inline
@@ -92,17 +95,25 @@ the layer is actually enabled."
     (dolist (layer (reverse astraea--enabled-layers))
       (when-let* ((spec (get layer 'astraea-layer))
                   (init (plist-get spec :init)))
-        (funcall init)))))
+        (condition-case err
+            (funcall init)
+          (error (message "Astraea: layer %s failed to init: %s"
+                          layer (error-message-string err))))))))
 
 (defun astraea/layers--run-config ()
   "Evaluate :config and :keybinds forms of enabled layers.
 Called once packages have been installed/loaded."
   (dolist (layer (reverse astraea--enabled-layers))
     (when-let* ((spec (get layer 'astraea-layer)))
-      (when-let* ((config (plist-get spec :config)))
-        (funcall config))
-      (when-let* ((kbs (plist-get spec :keybinds)))
-        (funcall kbs)))))
+      (condition-case err
+          (when-let* ((config (plist-get spec :config))) (funcall config))
+        (error (message "Astraea: layer %s config failed: %s"
+                        layer (error-message-string err))))
+      (condition-case err
+          (when-let* ((kbs (plist-get spec :keybinds)))
+            (funcall kbs))
+        (error (message "Astraea: layer %s keybinds failed: %s"
+                        layer (error-message-string err)))))))
 
 (defun astraea/list-layers ()
   "List all enabled layers with their packages."

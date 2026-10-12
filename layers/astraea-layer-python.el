@@ -9,7 +9,8 @@
   (progn
     (elpaca pyvenv)
     ;; LSP: pyright or pylsp via eglot; formatter: ruff; checker: ruff
-    (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver" "--stdio")))
+    (with-eval-after-load 'eglot
+      (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver" "--stdio"))))
     (add-hook 'python-mode-hook #'eglot-ensure)
     (add-hook 'python-mode-hook
               (lambda ()
