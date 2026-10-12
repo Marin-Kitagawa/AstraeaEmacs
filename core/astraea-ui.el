@@ -280,11 +280,14 @@ Derives colors from the `default' face so any theme stays consistent."
           beacon-blink-when-buffer-changes t
           beacon-blink-when-point-moves-vertically 10
           beacon-push-mark nil)             ; ultra-scroll already pushes
-    (dolist (cmd '(next-line previous-line forward-line
-                   scroll-up-command scroll-down-command
-                   evil-next-line evil-previous-line
-                   evil-scroll-down evil-scroll-up mwheel-scroll))
-      (add-to-list 'beacon-dont-blink-commands cmd))
+    ;; `beacon-dont-blink-commands' isn't autoloaded, so append only after
+    ;; `beacon' is loaded (triggered below by `beacon-mode').
+    (with-eval-after-load 'beacon
+      (dolist (cmd '(next-line previous-line forward-line
+                     scroll-up-command scroll-down-command
+                     evil-next-line evil-previous-line
+                     evil-scroll-down evil-scroll-up mwheel-scroll))
+        (add-to-list 'beacon-dont-blink-commands cmd)))
     (beacon-mode 1))
 
   ;; pulsar — pulse the line/region after jumps, edits, undo, window moves.

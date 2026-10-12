@@ -7,7 +7,9 @@
   :packages (pyvenv)  ; jupyter is queued by the scimax org stack (core)
   :init
   (progn
-    (elpaca pyvenv)
+    ;; the language registry may already have queued `pyvenv'; don't queue it twice.
+    (unless (and (fboundp 'elpaca-get) (elpaca-get 'pyvenv))
+      (eval '(elpaca pyvenv) t))
     ;; LSP: pyright or pylsp via eglot; formatter: ruff; checker: ruff
     (with-eval-after-load 'eglot
       (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver" "--stdio"))))
