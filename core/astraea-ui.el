@@ -93,6 +93,21 @@ file arguments."
   (mood-line-mode 1))
 
 ;; ── Tab bar: one tab per open file (bufferline) ──────────────────────────
+(defun astraea/ui//tab-icon (icon)
+  "Return nerd ICON ready for display in a tab-bar label.
+Emacs 31 renders tab-bar buttons as per-cell bevel boxes when the
+label face uses `nerd-icons-font-family' (Symbols Nerd Font Mono),
+so render the glyph with the frame's own family instead, keeping
+the icon's colour and vertical adjustment."
+  (let* ((glyph (substring-no-properties icon))
+         (face (get-text-property 0 'face icon))
+         (color (and (listp face) (plist-get face :inherit)))
+         (raise (get-text-property 0 'display icon)))
+    (propertize glyph
+                'face (append (list :family (face-attribute 'default :family))
+                              (and color (list :inherit color)))
+                'display raise)))
+
 (defun astraea/ui//tab-name-format (tab index)
   "Tab label with a nerd icon for `tab-bar-tab-name-format-function'.
 Astraea names every file tab after its buffer, so the buffer can be
@@ -103,7 +118,7 @@ resolved from the displayed label."
                     (buffer-live-p buf)
                     (with-current-buffer buf
                       (ignore-errors (nerd-icons-icon-for-buffer))))))
-    (if icon (concat icon " " name) name)))
+    (if icon (concat (astraea/ui//tab-icon icon) " " name) name)))
 
 (when (display-graphic-p)
   (require 'tab-bar)
