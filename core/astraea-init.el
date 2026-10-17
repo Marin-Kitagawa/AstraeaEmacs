@@ -194,16 +194,71 @@ elpaca renamed repos/ to sources/.")
 ;; `package-upgrade-all' (what topgrade calls) through elpaca instead of
 ;; letting it churn on an unrelated package.el database.  package.el is
 ;; loaded eagerly so topgrade's (featurep 'package) check succeeds.
+(defun astraea//elpaca-done-count ()
+  "Number of elpaca orders which have finished or failed."
+  (cl-loop for (_ . e) in (elpaca--queued)
+           count (memq (elpaca<-status e) '(finished failed))))
+
+(defun astraea//elpaca-wait (label)
+  "Wait for elpaca to finish, reporting progress for LABEL every 5s."
+  (let* ((total (length (elpaca--queued)))
+         (timer (run-with-timer
+                 5 5
+                 (lambda ()
+                   (message "Astraea: %s — %d of %d packages done"
+                            label (astraea//elpaca-done-count) total)))))
+    (unwind-protect (elpaca-wait)
+      (cancel-timer timer)
+      (message "Astraea: %s — finished (%d of %d packages)"
+               label (astraea//elpaca-done-count) total))))
+
+(defun astraea//git-behind-p (dir)
+  "Non-nil when DIR's git worktree is behind its upstream."
+  (let ((default-directory (file-name-as-directory dir)))
+    (with-temp-buffer
+      (and (zerop (or (ignore-errors
+                        (process-file "git" nil t nil
+                                      "rev-list" "--count" "HEAD..@{upstream}"))
+                      1))
+           (> (string-to-number (buffer-string)) 0)))))
+
+(defun astraea//elpaca-outdated-ids ()
+  "Ids of queued elpaca packages with upstream commits to merge."
+  (cl-loop for (id . e) in (elpaca--queued)
+           for dir = (elpaca<-source-dir e)
+           when (and dir
+                     (not (elpaca-pinned-p e))
+                     (file-exists-p dir)
+                     (astraea//git-behind-p dir))
+           collect id))
+
 (defun astraea/upgrade-packages ()
-  "Update and rebuild every elpaca-managed package."
+  "Update every elpaca-managed package.
+
+Interactively this queues elpaca's full asynchronous update.  In batch
+sessions (topgrade) all remotes are fetched first and only packages with
+upstream commits are merged and rebuilt, so unchanged packages are not
+recompiled on every unattended upgrade."
   (interactive)
   (require 'elpaca)
-  (elpaca-process-queues)
-  (elpaca-update-all t)
-  ;; elpaca works asynchronously; batch callers (topgrade) must not exit
-  ;; before the upgrade processes have finished
-  (when noninteractive
-    (elpaca-wait)))
+  (if (not noninteractive)
+      (elpaca-update-all t)
+    (message "Astraea: fetching package updates via elpaca")
+    (elpaca-fetch-all t)
+    (astraea//elpaca-wait "fetch")
+    (let ((outdated (astraea//elpaca-outdated-ids)))
+      (if (null outdated)
+          (message "Astraea: every package is up to date")
+        (message "Astraea: %d package(s) have updates — merging and rebuilding"
+                 (length outdated))
+        (dolist (id outdated) (elpaca-merge id))
+        (elpaca-process-queues)
+        (astraea//elpaca-wait "update")
+        (let ((failed (cl-loop for (_ . e) in (elpaca--queued)
+                               count (eq (elpaca<-status e) 'failed))))
+          (when (> failed 0)
+            (message "Astraea: %d package(s) failed to update — see *elpaca-log*"
+                     failed)))))))
 
 (require 'package nil t)
 (defun astraea//package-upgrade-all-advice (&optional _no-query)
