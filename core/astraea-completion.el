@@ -27,7 +27,9 @@
   (setq prefix-help-command #'embark-prefix-help-command))
 (elpaca embark-consult)
 (elpaca consult-dir)
-(elpaca nerd-icons-completion)
+(elpaca nerd-icons-completion
+  (with-eval-after-load 'marginalia
+    (nerd-icons-completion-mode 1)))
 
 ;; ── Helpful: richer *Help* buffers (h f / h v / h k) ────────────────
 (elpaca helpful)

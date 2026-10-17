@@ -46,7 +46,9 @@ file arguments."
 
 ;; ── Icons ─────────────────────────────────────────────────────────────────
 (elpaca nerd-icons)
-(elpaca nerd-icons-corfu)
+(elpaca nerd-icons-corfu
+  (with-eval-after-load 'corfu
+    (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter)))
 
 ;; ── Dashboard (alpha-nvim equivalent) ────────────────────────────────────
 (elpaca dashboard
@@ -56,6 +58,7 @@ file arguments."
                       (expand-file-name astraea-dashboard-banner user-emacs-directory)
                     astraea-dashboard-banner)))
       (setq dashboard-items '((recents . 10) (projects . 8) (bookmarks . 5) (agenda . 5))
+            dashboard-icon-type 'nerd-icons
             dashboard-startup-banner (if (and banner (file-exists-p banner)) banner 'logo)
             dashboard-banner-logo-title "✦  A S T R A E A  ✦"
             dashboard-center-content t
@@ -90,12 +93,25 @@ file arguments."
   (mood-line-mode 1))
 
 ;; ── Tab bar: one tab per open file (bufferline) ──────────────────────────
+(defun astraea/ui//tab-name-format (tab index)
+  "Tab label with a nerd icon for `tab-bar-tab-name-format-function'.
+Astraea names every file tab after its buffer, so the buffer can be
+resolved from the displayed label."
+  (let* ((name (tab-bar-tab-name-format-default tab index))
+         (buf (and (stringp name) (get-buffer name)))
+         (icon (and (fboundp 'nerd-icons-icon-for-buffer)
+                    (buffer-live-p buf)
+                    (with-current-buffer buf
+                      (ignore-errors (nerd-icons-icon-for-buffer))))))
+    (if icon (concat icon " " name) name)))
+
 (when (display-graphic-p)
   (require 'tab-bar)
   (tab-bar-mode 1)
   (setq tab-bar-show 0                ; always visible so file tabs are seen
         tab-bar-close-button-show nil
-        tab-bar-new-tab-to 'right))
+        tab-bar-new-tab-to 'right
+        tab-bar-tab-name-format-function #'astraea/ui//tab-name-format))
 
 (defcustom astraea-buffer-tabs-enabled t
   "When non-nil, visiting a file gives it its own tab in the tab bar.
@@ -188,26 +204,64 @@ Non-file buffers (dired, help, …) still use the same window."
 (elpaca treesit-fold)       ; UFO equivalent on Emacs 30+ treesit
 (elpaca electric-operator)
 
-;; ── tab-bar theming: match the active dark theme ────────────────────────
-(defun astraea/ui//apply-tab-bar-faces ()
-  "Style the tab-bar to match the active theme.
-Derives colors from the `default' face so any theme stays consistent."
+;; ── Astraea face pass: one palette, every surface ───────────────────────
+(require 'color)
+
+(defun astraea/ui//blend (color1 color2 amount)
+  "Return COLOR1 tinted with AMOUNT (0-1) of COLOR2, as a hex string."
+  (or (ignore-errors
+        (let ((rgb (color-blend (color-name-to-rgb color1)
+                                (color-name-to-rgb color2)
+                                (- 1 amount))))
+          (color-rgb-to-hex (nth 0 rgb) (nth 1 rgb) (nth 2 rgb) 2)))
+      color1))
+
+(defun astraea/ui//apply-faces ()
+  "Restyle Astraea's chrome from the active theme's `default' face.
+Every structural color derives from the theme, so any palette stays
+coherent.  Re-applied after each `load-theme'."
   (let* ((bg (face-attribute 'default :background nil 'default))
          (fg (face-attribute 'default :foreground nil 'default))
-         (dim (face-attribute 'font-lock-comment-face :foreground nil 'default)))
+         (dim (face-attribute 'font-lock-comment-face :foreground nil 'default))
+         (surface (astraea/ui//blend bg fg 0.07))
+         (guide (astraea/ui//blend bg fg 0.18))
+         (divider (astraea/ui//blend bg fg 0.30)))
     (set-face-attribute 'tab-bar nil :background bg :foreground fg :height 0.95)
     (set-face-attribute 'tab-bar-tab nil
-                        :background bg :foreground fg
+                        :background surface :foreground fg
                         :weight 'bold
-                        :box `(:line-width 3 :color ,bg :style nil))
+                        :box `(:line-width 3 :color ,surface :style nil))
     (set-face-attribute 'tab-bar-tab-inactive nil
                         :background bg :foreground dim
                         :box `(:line-width 3 :color ,bg :style nil))
-    (set-face-attribute 'tab-line nil :background bg :foreground fg)))
+    (set-face-attribute 'tab-line nil :background bg :foreground fg)
+    (set-face-attribute 'fringe nil :background bg :foreground guide)
+    (set-face-attribute 'window-divider nil :foreground divider)
+    (set-face-attribute 'window-divider-first-pixel nil :foreground divider)
+    (set-face-attribute 'window-divider-last-pixel nil :foreground divider)
+    (set-face-attribute 'vertical-border nil :foreground divider)
+    (set-face-attribute 'fill-column-indicator nil :foreground guide)
+    (set-face-attribute 'minibuffer-prompt nil :weight 'bold)
+    (set-face-attribute 'corfu-border nil :background (astraea/ui//blend bg fg 0.22))
+    (set-face-attribute 'mood-line-buffer-name nil :weight 'bold)
+    (set-face-attribute 'treemacs-root-face nil :weight 'bold)
+    (set-face-attribute 'org-document-title nil :height 1.3 :weight 'bold)
+    (set-face-attribute 'org-level-1 nil :height 1.2 :weight 'bold)
+    (set-face-attribute 'org-level-2 nil :height 1.12 :weight 'bold)
+    (set-face-attribute 'org-level-3 nil :height 1.05)))
+
+(defun astraea/ui//apply-tab-bar-faces ()
+  "Kept for `astraea-appearance': runs the full Astraea face pass."
+  (astraea/ui//apply-faces))
 
 ;; restyle automatically whenever a theme is (re)loaded
 (advice-add 'load-theme :after
-            (lambda (&rest _) (astraea/ui//apply-tab-bar-faces)))
+            (lambda (&rest _) (astraea/ui//apply-faces)))
+
+;; packages that (re)define faces when they load get a final Astraea pass
+(mapc (lambda (feat)
+        (with-eval-after-load feat #'astraea/ui//apply-faces))
+      '(mood-line corfu treemacs org))
 
 (defun astraea/ui//finish ()
   "Final UI pass, after all packages are loaded."
