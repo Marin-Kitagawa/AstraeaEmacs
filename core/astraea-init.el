@@ -205,11 +205,11 @@ elpaca renamed repos/ to sources/.")
          (timer (run-with-timer
                  5 5
                  (lambda ()
-                   (message "Astraea: %s — %d of %d packages done"
+                   (message "Astraea: %s - %d of %d packages done"
                             label (astraea//elpaca-done-count) total)))))
     (unwind-protect (elpaca-wait)
       (cancel-timer timer)
-      (message "Astraea: %s — finished (%d of %d packages)"
+      (message "Astraea: %s - finished (%d of %d packages)"
                label (astraea//elpaca-done-count) total))))
 
 (defun astraea//git-behind-p (dir)
@@ -249,7 +249,7 @@ recompiled on every unattended upgrade."
     (let ((outdated (astraea//elpaca-outdated-ids)))
       (if (null outdated)
           (message "Astraea: every package is up to date")
-        (message "Astraea: %d package(s) have updates — merging and rebuilding"
+        (message "Astraea: %d package(s) have updates - merging and rebuilding"
                  (length outdated))
         (dolist (id outdated) (elpaca-merge id))
         (elpaca-process-queues)
@@ -257,13 +257,18 @@ recompiled on every unattended upgrade."
         (let ((failed (cl-loop for (_ . e) in (elpaca--queued)
                                count (eq (elpaca<-status e) 'failed))))
           (when (> failed 0)
-            (message "Astraea: %d package(s) failed to update — see *elpaca-log*"
+            (message "Astraea: %d package(s) failed to update - see *elpaca-log*"
                      failed)))))))
 
 (require 'package nil t)
 (defun astraea//package-upgrade-all-advice (&optional _no-query)
-  "Replacement for `package-upgrade-all' — elpaca owns the packages."
-  (astraea/upgrade-packages))
+  "Replacement for `package-upgrade-all' — elpaca owns the packages.
+
+In batch sessions Emacs exits with status 0 once the upgrade finished,
+so unattended callers (topgrade) see success as soon as the upgrade
+itself completed instead of relying on the shutdown path."
+  (astraea/upgrade-packages)
+  (when noninteractive (kill-emacs 0)))
 (when (fboundp 'package-upgrade-all)
   (advice-add 'package-upgrade-all :override
               #'astraea//package-upgrade-all-advice))

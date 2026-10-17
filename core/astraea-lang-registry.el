@@ -142,7 +142,7 @@ Interactive with completion over `astraea-lang-registry'."
           (add-to-list 'eglot-server-programs (cons mode lsp)))))
     (cl-pushnew id astraea--lang-enabled)
     (message "Astraea: language %s enabled%s" id
-             (if grammar " (treesit grammar available — M-x astraea/treesit-install-all)" ""))))
+             (if grammar " (treesit grammar available, M-x astraea/treesit-install-all)" ""))))
 
 (defun astraea/lang-enable-many (ids)
   "Enable several languages."
