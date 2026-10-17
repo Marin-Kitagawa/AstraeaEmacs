@@ -34,9 +34,10 @@
 
 ;; ── Literate notebooks (ob-ipython / scimax equivalent) ────────────────
 (elpaca jupyter
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((python . t) (jupyter . t) (emacs-lisp . t) (shell . t) (sql . t)))
+  (with-eval-after-load 'org
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((python . t) (jupyter . t) (emacs-lisp . t) (shell . t) (sql . t))))
   (setq org-babel-default-header-args:jupyter-python
         '((:session . "py") (:kernel . "python3") (:async . "yes"))))
 
@@ -68,7 +69,7 @@
            :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
            :unnarrowed t)))
   (make-directory org-roam-directory t)
-  (org-roam-db-autosync-mode 1))
+  (run-with-idle-timer 2 nil (lambda () (org-roam-db-autosync-mode 1))))
 
 ;; ── Export & publishing ────────────────────────────────────────────────
 (elpaca ox-pandoc)                    ; every output format pandoc supports

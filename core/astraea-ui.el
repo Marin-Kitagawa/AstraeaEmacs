@@ -185,7 +185,7 @@ Non-file buffers (dired, help, …) still use the same window."
 (elpaca treemacs-evil)
 (elpaca treemacs-projectile)
 (elpaca treemacs-icons-dired
-  (treemacs-icons-dired-mode))
+  (run-with-idle-timer 2 nil (lambda () (treemacs-icons-dired-mode 1))))
 
 ;; ── Themes: beautiful, feminine, cute — no doom, ever ────────────────
 (elpaca catppuccin-theme)             ; pastel mocha/frappé (theme: catppuccin)
@@ -216,6 +216,13 @@ Non-file buffers (dired, help, …) still use the same window."
           (color-rgb-to-hex (nth 0 rgb) (nth 1 rgb) (nth 2 rgb) 2)))
       color1))
 
+(defun astraea/ui//set-face (face &rest attrs)
+  "Apply ATTRS to FACE, skipping faces that are not defined yet.
+Deferred packages define their faces on load; the `with-eval-after-load'
+hooks re-run the full pass once they do."
+  (when (facep face)
+    (apply #'set-face-attribute face nil attrs)))
+
 (defun astraea/ui//apply-faces ()
   "Restyle Astraea's chrome from the active theme's `default' face.
 Every structural color derives from the theme, so any palette stays
@@ -242,13 +249,13 @@ coherent.  Re-applied after each `load-theme'."
     (set-face-attribute 'vertical-border nil :foreground divider)
     (set-face-attribute 'fill-column-indicator nil :foreground guide)
     (set-face-attribute 'minibuffer-prompt nil :weight 'bold)
-    (set-face-attribute 'corfu-border nil :background (astraea/ui//blend bg fg 0.22))
-    (set-face-attribute 'mood-line-buffer-name nil :weight 'bold)
-    (set-face-attribute 'treemacs-root-face nil :weight 'bold)
-    (set-face-attribute 'org-document-title nil :height 1.3 :weight 'bold)
-    (set-face-attribute 'org-level-1 nil :height 1.2 :weight 'bold)
-    (set-face-attribute 'org-level-2 nil :height 1.12 :weight 'bold)
-    (set-face-attribute 'org-level-3 nil :height 1.05)))
+    (astraea/ui//set-face 'corfu-border :background (astraea/ui//blend bg fg 0.22))
+    (astraea/ui//set-face 'mood-line-buffer-name :weight 'bold)
+    (astraea/ui//set-face 'treemacs-root-face :weight 'bold)
+    (astraea/ui//set-face 'org-document-title :height 1.3 :weight 'bold)
+    (astraea/ui//set-face 'org-level-1 :height 1.2 :weight 'bold)
+    (astraea/ui//set-face 'org-level-2 :height 1.12 :weight 'bold)
+    (astraea/ui//set-face 'org-level-3 :height 1.05)))
 
 (defun astraea/ui//apply-tab-bar-faces ()
   "Kept for `astraea-appearance': runs the full Astraea face pass."
@@ -259,9 +266,8 @@ coherent.  Re-applied after each `load-theme'."
             (lambda (&rest _) (astraea/ui//apply-faces)))
 
 ;; packages that (re)define faces when they load get a final Astraea pass
-(mapc (lambda (feat)
-        (with-eval-after-load feat #'astraea/ui//apply-faces))
-      '(mood-line corfu treemacs org))
+(dolist (feat '(mood-line corfu treemacs org))
+  (eval-after-load feat #'astraea/ui//apply-faces))
 
 (defun astraea/ui//finish ()
   "Final UI pass, after all packages are loaded."
