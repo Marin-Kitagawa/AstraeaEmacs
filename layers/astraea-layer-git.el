@@ -17,10 +17,11 @@
           magit-save-repository-buffers 'dontask)
     (global-diff-hl-mode 1)
     (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)
-    (require 'etags)
-    (magit-todos-mode 1)
-    (remove-hook 'after-init-hook #'magit-version)
-    (magit-version nil nil t))
+    (with-eval-after-load 'magit
+      (remove-hook 'after-init-hook #'magit-version)
+      (magit-version nil nil t)
+      (require 'etags)
+      (magit-todos-mode 1)))
   :keybinds
   (progn
     (astraea/leader-def
