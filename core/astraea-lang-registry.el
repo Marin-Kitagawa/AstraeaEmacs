@@ -112,9 +112,10 @@ and formatter.  Derived from spacemacs +lang/* layers (all 84).")
 
 (defvar astraea--lang-enabled nil)
 
-(defun astraea/lang-enable (id)
+(defun astraea/lang-enable (id &optional quiet)
   "Enable language ID: install packages, wire treesit remap + LSP.
-Interactive with completion over `astraea-lang-registry'."
+Interactive with completion over `astraea-lang-registry'.  QUIET
+suppresses the confirmation message (used for bulk enabling)."
   (interactive
    (list (intern (completing-read
                   "Language: "
@@ -141,8 +142,9 @@ Interactive with completion over `astraea-lang-registry'."
         (dolist (mode (plist-get spec :modes))
           (add-to-list 'eglot-server-programs (cons mode lsp)))))
     (cl-pushnew id astraea--lang-enabled)
-    (message "Astraea: language %s enabled%s" id
-             (if grammar " (treesit grammar available, M-x astraea/treesit-install-all)" ""))))
+    (unless quiet
+      (message "Astraea: language %s enabled%s" id
+               (if grammar " (treesit grammar available, M-x astraea/treesit-install-all)" "")))))
 
 (defun astraea/lang-enable-many (ids)
   "Enable several languages."
@@ -202,15 +204,45 @@ Interactive with completion over `astraea-lang-registry'."
                         :c++ astraea-treesit-cc-program)
                   treesit-language-source-alist :test #'equal))))
 
-;; ── enable default languages at boot ────────────────────────────────
-(dolist (id (if (eq astraea-lang-default-enabled 'all)
-                (mapcar #'car astraea-lang-registry)
-              astraea-lang-default-enabled))
-  (when (assq id astraea-lang-registry)
+;; ── enable default languages (deferred off the startup path) ────────
+
+(defcustom astraea-lang-enable-delay 1.5
+  "Idle seconds before the default languages are registered.
+A non-nil value keeps the boot-time package burst off the startup
+path: the frame is usable immediately and language packages are
+queued once Emacs goes idle.  Set to nil to register them inline."
+  :type '(choice (const :tag "During startup" nil) number))
+
+(defun astraea/lang-enable-defaults ()
+  "Enable the languages selected by `astraea-lang-default-enabled'."
+  (dolist (id (if (eq astraea-lang-default-enabled 'all)
+                  (mapcar #'car astraea-lang-registry)
+                astraea-lang-default-enabled))
+    (when (assq id astraea-lang-registry)
+      (condition-case err
+          (astraea/lang-enable id 'quiet)
+        (error (message "Astraea: language %s failed to enable: %s"
+                        id (error-message-string err))))))
+  ;; Orders queued after init are not processed by elpaca on their own.
+  (when (fboundp 'elpaca-process-queues)
     (condition-case err
-        (astraea/lang-enable id)
-      (error (message "Astraea: language %s failed to enable: %s"
-                      id (error-message-string err))))))
+        (elpaca-process-queues)
+      (error (message "Astraea: language packages not processed: %s"
+                      (error-message-string err))))))
+
+(defvar astraea--lang-defaults-scheduled nil
+  "Non-nil once `astraea/lang-schedule-defaults' has run.")
+
+(defun astraea/lang-schedule-defaults ()
+  "Register the default languages once the frame is up.
+Honours `astraea-lang-enable-delay'; called from `astraea//finish-init'
+so the user config has had a chance to customize it."
+  (unless astraea--lang-defaults-scheduled
+    (setq astraea--lang-defaults-scheduled t)
+    (if astraea-lang-enable-delay
+        (run-with-idle-timer astraea-lang-enable-delay nil
+                             #'astraea/lang-enable-defaults)
+      (astraea/lang-enable-defaults))))
 
 (provide 'astraea-lang-registry)
 ;;; astraea-lang-registry.el ends here

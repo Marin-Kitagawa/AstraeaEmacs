@@ -91,6 +91,9 @@ Astraea treats startup time and idle memory as first-class features:
 * `early-init.el` defers garbage collection, strips file-name handlers, and
   removes frame chrome before the GUI exists.
 * **Every** package defers until first use (`:commands`, `:hook`, `:after`).
+* Language layers are registered a moment after the frame is up
+  (`astraea-lang-enable-delay`, 1.5 s of idle by default) instead of
+  queueing ~80 language packages on the startup path.
 * elpaca installs and AOT-native-compiles packages **in parallel**
   (`elpaca-queue-limit 4` on Windows to keep `git.exe` stable).
 * `gcmh` throttles GC at idle; extra collection runs on frame focus loss.

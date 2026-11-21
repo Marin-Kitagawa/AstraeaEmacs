@@ -182,6 +182,10 @@ elpaca renamed repos/ to sources/.")
       (error (message "Astraea: UI setup failed: %s"
                       (error-message-string err))))
     (run-hooks 'astraea-after-init-hook)
+    ;; Language packages are queued after the frame is up, off the
+    ;; startup path (see `astraea-lang-enable-delay').
+    (when (fboundp 'astraea/lang-schedule-defaults)
+      (astraea/lang-schedule-defaults))
     (when astraea-startup-benchmark
       (astraea/report-startup-time))
     (message "Astraea %s ready in %.2fs with %d layers (%s modal)"
