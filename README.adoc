@@ -155,6 +155,9 @@ post-queue hooks and an idle-timer fallback.
 
 | `astraea-integrations`
 | opt-in bridges: copilot, elcord (Discord), wakatime, editorconfig
+
+| `astraea-raku-regex`
+| Raku regexp search/replace: native translator + real `raku` engine
 |===
 
 """
@@ -297,7 +300,63 @@ image::keybindings.svg[Leader keymap tree]
 
 | `SPC s h`
 | consult-history
+
+| `SPC s r`
+| Raku search (real engine) — next match
+
+| `SPC s R`
+| Raku occur
+
+| `SPC s e`
+| Raku s/// replace in region/buffer
+
+| `SPC s t` / `SPC s d`
+| Raku match test / pattern translator explainer
+
+| `SPC s w`
+| cycle Raku whitespace handling
 |===
+
+=== Raku regular expressions — `SPC s r` and the `+tools/raku-regex` layer
+
+Astraea can drive every regexp surface with **Raku (Perl 6) syntax**:
+incremental search (`C-s` in regexp mode), evil `/` and `:s`,
+`query-replace-regexp`, `replace-regexp`, `occur`, `keep-lines`,
+`flush-lines`, `align-regexp`, `highlight-regexp` and `how-many`.
+
+Enable it with the layer (it is already on in the seed config):
+
+[source,elisp]
+----
+(astraea/enable-layer '+tools/raku-regex)
+;; or just: (astraea-raku-regex-mode 1)
+----
+
+Two engines back it:
+
+. **Native translation** turns the Raku pattern into an equivalent Emacs
+  regexp, so the normal fast Emacs machinery does the searching.  Covered:
+  literals, `.`, `\d \w \s \h \v \N`, `<[...]>`, `<-[...]>`, set operations
+  (`<[a..z] - [aeiou]>`), `<[a..z]>` ranges, `** N..M`, lazy quantifiers,
+  `|`/`||`, `^`/`$`/`^^`/`$$`, `<<`/`>>`/`«`/`»`, capturing groups,
+  `$<name>=(…)`, `<( … )>`, `:i`/`:s`/`:g` adverbs and `'…'` literals.
+. **The real Raku engine** (`raku` on PATH — Raku++ on Windows) handles what
+  Emacs regexps cannot express: lookaround (`<?before …>`), exact set
+  algebras, and `s///` replacements that are evaluated as Raku code.
+  It powers `astraea/raku-regex-search`, `-occur`, `-test` and
+  `-replace-region`.
+
+Raku semantics are honoured exactly, including the two that surprise Emacs
+users: whitespace between tokens is **ignored** (`a b` matches `ab`; use
+`:s` for significant whitespace, or cycle the policy with `SPC s w`), and
+`.` matches newline.  `^` is the start of the string while `^^` is the start
+of a line.
+
+Replacements use Raku's interpolated-string rules: `$0` is the first
+capture, `$<name>` a named capture, `$/` the whole match (or the
+`<( … )>` region) and `{ … }` runs Raku code.  Inspect any pattern with
+`M-x astraea/raku-regex-describe`; paste `emacs:` in front of a pattern to
+pass a plain Emacs regexp through untouched.
 
 === Jump — `SPC j` (flash.nvim equivalent)
 
